@@ -4,7 +4,10 @@
   let id = Number(new URLSearchParams(location.search).get('id'));
   const m = location.pathname.match(/\/ege\/([a-z-]+)\/(\d+)/);
   if (m) id = Number(m[2]);
-  const task = window.TASKS.find(t => t.id === id);
+  const taskMeta = window.TASKS.find(t => t.id === id);
+  const content = (window.EAZY_CONTENT || {})[id] || null;
+  const task = taskMeta ? { ...taskMeta, ...(content || {}) } : null;
+  if (task) task.ready = taskMeta.ready && !!content;
   const root = $('#lesson-content');
   $('#breadcrumb-task').textContent = task ? `${task.id}` : 'Не найдено';
 
