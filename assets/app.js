@@ -21,9 +21,13 @@
   function toggleTheme(x, y) {
     const dark = document.documentElement.dataset.theme !== 'dark';
     try { localStorage.setItem('yasno-theme', dark ? 'dark' : 'light'); } catch (_) {}
+    const updateIcons = () => {
+      $$('#menu-theme use').forEach(u => u.setAttribute('href', dark ? '#i-sun' : '#i-moon'));
+      $$('.theme-toggle').forEach(b => b.innerHTML = icon(dark ? 'sun' : 'moon'));
+    };
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || !document.startViewTransition) { applyTheme(dark); return; }
-    const vt = document.startViewTransition(() => applyTheme(dark));
+    if (reduced || !document.startViewTransition) { applyTheme(dark); updateIcons(); return; }
+    const vt = document.startViewTransition(() => { applyTheme(dark); updateIcons(); });
     vt.ready.then(() => {
       const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
       const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
@@ -154,7 +158,10 @@
     });
     ov.querySelectorAll('.acc-head.disabled').forEach(b => b.addEventListener('click', () => window.showToast('Этот раздел скоро появится')));
     ov.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-    ov.querySelector('#menu-theme').addEventListener('click', e => toggleTheme(e.clientX, e.clientY));
+    ov.querySelector('#menu-theme').addEventListener('click', e => {
+      const b = e.currentTarget.getBoundingClientRect();
+      toggleTheme(b.left + b.width / 2, b.top + b.height / 2);
+    });
 
   }
 

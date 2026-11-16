@@ -1,4 +1,4 @@
-const CACHE = 'eazy-v10';
+const CACHE = 'eazy-v11';
 const SHELL = [
   './',
   './index.html',
