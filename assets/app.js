@@ -45,15 +45,12 @@
   };
 
   function taskCard(task) {
-    const completed = storage.get(`complete-${task.id}`, false);
-    const progress = storage.get(`answers-${task.id}`, {});
-    const solved = Object.values(progress).filter(item => item.correct).length;
     const card = task.ready ? 'a' : 'article';
     return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="/ege/informatika/${task.id}/" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
-      <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span>${completed ? `<span class="task-status" title="Разбор пройден">${icon('check')}</span>` : ''}</div>
+      <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
       <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
       <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
-      <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${solved}/${task.practices.length} задач · ${task.time} мин</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
+      <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.practices.length} задачи · ${task.time} мин</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
     </${card}>`;
   }
   window.taskCard = taskCard;
@@ -105,26 +102,27 @@
     ov.hidden = true;
     ov.innerHTML = `
       <div class="menu-panel" role="dialog" aria-modal="true" aria-label="Меню">
-        <div class="menu-head"><span class="menu-logo">EAZY<span class="brand-dot">.</span></span><button class="icon-button menu-close" aria-label="Закрыть меню"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+        <div class="menu-head">
+          <div class="menu-brand"><span class="menu-logo">EAZY<span class="brand-dot">.</span></span><span class="menu-tagline">Every Answer Zips to You</span></div>
+          <button class="icon-button menu-close" aria-label="Закрыть меню"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
         <div class="menu-scroll">
-          <p class="menu-section">Экзамены</p>
-          <div class="acc" data-acc="ege">
-            <button class="acc-head open" aria-expanded="true"><span class="acc-title">ЕГЭ</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="acc open" data-acc="ege">
+            <button class="acc-head open" aria-expanded="true"><svg viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4Zm16 0h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4Z"/></svg><span class="acc-title">Каталог</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
             <div class="acc-body open">
-              ${subjects.map(s => s.active ? `
               <div class="acc" data-acc="subject">
-                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">${s.name}</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">ЕГЭ · Информатика</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
                 <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/ege/informatika/${t.id}/"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
-              </div>` : `
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">${s.name}</span><span class="menu-soon">скоро</span></button>`).join('')}
+              </div>
+              <button class="acc-head sub disabled" type="button"><span class="acc-title">ЕГЭ · Математика</span><span class="menu-soon">скоро</span></button>
+              <button class="acc-head sub disabled" type="button"><span class="acc-title">ЕГЭ · Русский язык</span><span class="menu-soon">скоро</span></button>
+              <button class="acc-head sub disabled" type="button"><span class="acc-title">ОГЭ</span><span class="menu-soon">скоро</span></button>
             </div>
           </div>
-          <button class="acc-head disabled" type="button"><span class="acc-title">ОГЭ</span><span class="menu-soon">скоро</span></button>
           <div class="menu-divider"></div>
-          <a class="menu-link" href="/info/">О проекте</a>
-          <a class="menu-link accent" href="/support/">Поддержать <svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"/></svg></a>
-          <div class="menu-divider"></div>
-          <button class="menu-link as-btn" id="menu-theme"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><use href="#i-moon"/></svg> Тема: <span class="menu-theme-state">${document.documentElement.dataset.theme === 'dark' ? 'Светлая' : 'Тёмная'}</span></button>
+          <a class="menu-link" href="/info/"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></svg> О проекте</a>
+          <a class="menu-link accent" href="/support/"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"/></svg> Поддержать</a>
+          <button class="menu-link as-btn" id="menu-theme"><svg viewBox="0 0 24 24"><use href="#i-moon"/></svg> Тема: <span class="menu-theme-state">${document.documentElement.dataset.theme === 'dark' ? 'Светлая' : 'Тёмная'}</span></button>
         </div>
       </div>`;
     document.body.appendChild(ov);
@@ -161,7 +159,7 @@
     });
     ov.querySelectorAll('.acc-head.disabled').forEach(b => b.addEventListener('click', () => window.showToast('Этот раздел скоро появится')));
     ov.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-    ov.querySelector('#menu-theme').addEventListener('click', e => { const r = e.currentTarget.getBoundingClientRect(); toggleTheme(r.left + r.width / 2, r.top + r.height / 2); });
+    ov.querySelector('#menu-theme').addEventListener('click', e => toggleTheme(e.clientX, e.clientY));
   }
 
   // Поиск (Ctrl+K)

@@ -301,3 +301,25 @@ body{padding-bottom:0!important}
 /* Смена темы: View Transition без вспышки */
 ::view-transition-old(root){animation:none}
 ::view-transition-new(root){animation:none;mix-blend-mode:normal}
+
+/* ===== Меню-шторка слева (v4, telegram-style) ===== */
+.menu-panel{inset:0 auto 0 0;right:auto;left:0;width:min(310px,86vw);border-left:0;border-right:1px solid var(--line);transform:translateX(-102%);transition:transform .26s cubic-bezier(.32,.8,.3,1);background:var(--surface)}
+.menu-overlay.open .menu-panel{transform:translateX(0)}
+.menu-head{align-items:flex-start;padding:16px 14px 14px}
+.menu-brand{display:flex;flex-direction:column;gap:2px}
+.menu-logo{font-size:22px}
+.menu-tagline{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.menu-scroll{padding:6px 10px calc(20px + env(safe-area-inset-bottom,0px))}
+.menu-scroll .menu-link{border:0;background:transparent;padding:11px 12px;font-size:14px;font-weight:600;border-radius:10px}
+.menu-scroll .menu-link svg{width:17px;height:17px;color:var(--muted)}
+.menu-scroll .menu-link.accent svg{color:var(--accent)}
+.acc{border:0;background:transparent;margin-bottom:0}
+.acc-body .acc{margin:0 0 0 10px;border-left:1px solid var(--line);border-radius:0}
+.acc-head{font-size:14px;padding:11px 12px;font-weight:600;border-radius:10px}
+.acc-head svg:not(.acc-chev){width:17px;height:17px;color:var(--muted)}
+.acc-head>svg:first-child{color:var(--muted)}
+.acc-head.open>svg.acc-chev{color:var(--accent)}
+.acc-head.sub{font-size:13px;font-weight:600}
+.acc-head.disabled{border:0;margin:0 0 0 10px;padding:11px 12px;font-size:13px;font-weight:500}
+.acc-body.open{max-height:none}
+.menu-section{display:none}

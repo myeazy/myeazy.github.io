@@ -50,8 +50,6 @@
     const prev = [...window.TASKS].reverse().find(t => t.ready && t.id < task.id);
     const embed = task.video ? videoEmbed(task.video) : null;
     const answers = storage.get(`answers-${task.id}`, {});
-    const solvedCount = Object.values(answers).filter(a => a.correct).length;
-    const completed = storage.get(`complete-${task.id}`, false);
 
     root.innerHTML = `
       <div class="lesson-header">
@@ -79,7 +77,7 @@
             <div id="panel-code" role="tabpanel"><div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" id="copy-code">${icon('copy')} Копировать</button></div><pre><code id="code-block">${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div></div>
             <div id="panel-mistakes" role="tabpanel" hidden><div class="errors-box">${task.errors.map((e, i) => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${escapeHtml(e)}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div></div>
           </section>
-          <section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${task.video ? '05' : '04'}</span>Тренировка</h2><span class="practice-counter" id="practice-counter"></span></div>
+          <section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${task.video ? '05' : '04'}</span>Тренировка</h2></div>
             <div class="practice-area">${task.practices.map((p, i) => {
               const saved = answers[i];
               return `<article class="practice-card ${saved ? (saved.correct ? 'correct' : 'incorrect') : ''}" data-index="${i}">
@@ -93,8 +91,7 @@
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
           <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${task.video ? '<a href="#video">Видеоразбор</a>' : ''}<a href="#code">Код и ошибки</a><a href="#practice">Тренировка</a>
-        </nav><div class="toc-progress"><div class="toc-progress-label">Практика</div><div class="progress-line"><span id="toc-progress-fill" style="width:${solvedCount / task.practices.length * 100}%"></span></div><small id="toc-progress-text">Решено ${solvedCount} из ${task.practices.length}</small></div>
-        <button class="aside-complete ${completed ? 'completed' : ''}" id="mark-complete-aside">${icon('check')} <span>${completed ? 'Разбор пройден' : 'Отметить пройденным'}</span></button></div></aside>
+        </nav></div></aside>
       </div>`;
 
     // Видео: загрузка по клику
@@ -119,25 +116,9 @@
       catch { window.showToast('Не получилось скопировать — выдели код вручную'); }
     });
 
-    // Отметка о прохождении (кнопка в сайдбаре)
-    const toggleComplete = () => {
-      const now = !storage.get(`complete-${task.id}`, false);
-      storage.set(`complete-${task.id}`, now);
-      const b = $('#mark-complete-aside');
-      if (b) { b.querySelector('span').textContent = now ? 'Разбор пройден' : 'Отметить пройденным'; b.classList.toggle('completed', now); }
-      window.showToast(now ? `Задание ${task.id} отмечено пройденным` : 'Отметка снята');
-    };
-    $('#mark-complete-aside')?.addEventListener('click', toggleComplete);
 
     // Практика
-    const updateCounter = () => {
-      const cur = storage.get(`answers-${task.id}`, {});
-      const solved = Object.values(cur).filter(a => a.correct).length;
-      $('#practice-counter').textContent = `Решено ${solved} из ${task.practices.length}`;
-      const fill = $('#toc-progress-fill'), text = $('#toc-progress-text');
-      if (fill) fill.style.width = `${solved / task.practices.length * 100}%`;
-      if (text) text.textContent = `Решено ${solved} из ${task.practices.length}`;
-    };
+    const updateCounter = () => {};
     const check = (card, index) => {
       const p = task.practices[index];
       const inputEl = card.querySelector('.answer-input');
