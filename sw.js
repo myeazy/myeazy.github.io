@@ -1,9 +1,10 @@
-const CACHE = 'eazy-v4';
+const CACHE = 'eazy-v5';
 const SHELL = [
   './',
   './index.html',
   './app/',
   './info/',
+  './support/',
   './ege/informatika/8/',
   './ege/informatika/13/',
   './ege/informatika/25/',

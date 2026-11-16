@@ -22,19 +22,16 @@
     const dark = document.documentElement.dataset.theme !== 'dark';
     try { localStorage.setItem('yasno-theme', dark ? 'dark' : 'light'); } catch (_) {}
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || !document.createElement('div').animate) { applyTheme(dark); return; }
-    // Круговая анимация от точки клика
-    const clip = document.createElement('div');
-    clip.className = 'theme-reveal';
-    clip.style.setProperty('--x', (x ?? innerWidth / 2) + 'px');
-    clip.style.setProperty('--y', (y ?? innerHeight / 2) + 'px');
-    clip.dataset.to = dark ? 'dark' : 'light';
-    document.body.appendChild(clip);
-    const r = Math.hypot(Math.max(x ?? 0, innerWidth - (x ?? 0)), Math.max(y ?? 0, innerHeight - (y ?? 0)));
-    clip.animate(
-      [{ clipPath: `circle(0px at var(--x) var(--y))` }, { clipPath: `circle(${r}px at var(--x) var(--y))` }],
-      { duration: 550, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }
-    ).onfinish = () => { applyTheme(dark); clip.remove(); };
+    if (reduced || !document.startViewTransition) { applyTheme(dark); return; }
+    const vt = document.startViewTransition(() => applyTheme(dark));
+    vt.ready.then(() => {
+      const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
+      const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${cx}px ${cy}px)`, `circle(${r}px at ${cx}px ${cy}px)`] },
+        { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)', pseudoElement: '::view-transition-new(root)' }
+      );
+    }).catch(() => {});
   }
   window.toggleTheme = toggleTheme;
 

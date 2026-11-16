@@ -6,7 +6,7 @@
   if (m) id = Number(m[2]);
   const task = window.TASKS.find(t => t.id === id);
   const root = $('#lesson-content');
-  $('#breadcrumb-task').textContent = task ? `Задание ${task.id}` : 'Не найдено';
+  $('#breadcrumb-task').textContent = task ? `${task.id}` : 'Не найдено';
 
   function normalize(value) {
     return String(value).trim().toLowerCase().replace(/\s+/g, ' ').replace(/,(\d)/g, '.$1').replace(/[ё]/g, 'е');
