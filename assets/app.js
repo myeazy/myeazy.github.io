@@ -97,7 +97,7 @@
     ov.innerHTML = `
       <div class="menu-panel" role="dialog" aria-modal="true" aria-label="Меню">
         <div class="menu-head">
-          <div class="menu-brand"><span class="menu-logo">EAZY<span class="brand-dot">.</span></span><span class="menu-tagline">Every Answer Zips to You</span></div>
+          <div class="menu-brand"><a class="menu-logo" href="/">EAZY<span class="brand-dot">.</span></a><span class="menu-tagline">Every Answer Zips to You</span></div>
           <button class="icon-button menu-close" aria-label="Закрыть меню"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
         <div class="menu-scroll">
@@ -156,46 +156,6 @@
     ov.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
     ov.querySelector('#menu-theme').addEventListener('click', e => toggleTheme(e.clientX, e.clientY));
 
-    // Свайпы: открытие от левого края, закрытие влево — панель следует за пальцем
-    let drag = null;
-    const panelW = () => panel.offsetWidth;
-    document.addEventListener('pointerdown', e => {
-      if (ov.hidden) {
-        if (e.clientX <= 36) drag = { mode: 'open', x0: e.clientX, y0: e.clientY, active: false };
-      } else if (panel.contains(e.target) || e.target === ov) {
-        drag = { mode: 'close', x0: e.clientX, y0: e.clientY, active: false };
-      }
-    }, { passive: true });
-    document.addEventListener('pointermove', e => {
-      if (!drag) return;
-      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
-      if (!drag.active) {
-        if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
-        if (Math.abs(dx) < 10) return;
-        if (drag.mode === 'open' && dx > 0) { ov.hidden = false; ov.classList.add('open'); document.body.style.overflow = 'hidden'; drag.active = true; }
-        else if (drag.mode === 'close' && dx < 0) drag.active = true;
-        else return;
-      }
-      if (e.cancelable) e.preventDefault();
-      const w = panelW();
-      const px = drag.mode === 'open' ? Math.min(0, -w + dx) : Math.min(0, dx);
-      panel.style.transition = 'none';
-      panel.style.transform = `translateX(${px}px)`;
-    }, { passive: false });
-    const endDrag = e => {
-      if (!drag) return;
-      const wasActive = drag.active, dx = e.clientX - drag.x0, w = panelW();
-      panel.style.transition = ''; panel.style.transform = '';
-      if (wasActive) {
-        if (drag.mode === 'open') {
-          if (dx > w * 0.3) menuBtn.setAttribute('aria-expanded', 'true');
-          else closeMenu();
-        } else if (dx <= -w * 0.3) closeMenu();
-      }
-      drag = null;
-    };
-    document.addEventListener('pointerup', endDrag, { passive: true });
-    document.addEventListener('pointercancel', () => { drag = null; }, { passive: true });
   }
 
   // Поиск (Ctrl+K)
