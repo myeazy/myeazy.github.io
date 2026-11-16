@@ -323,3 +323,24 @@ body{padding-bottom:0!important}
 .acc-head.disabled{border:0;margin:0 0 0 10px;padding:11px 12px;font-size:13px;font-weight:500}
 .acc-body.open{max-height:none}
 .menu-section{display:none}
+
+/* ===== Меню v5: на всю высоту, фикс. шапка и низ, свайпы ===== */
+.menu-overlay{touch-action:none}
+.menu-panel{inset:0 auto 0 0;top:0;bottom:0;height:100%;height:100dvh;width:min(310px,86vw);display:flex;flex-direction:column;background:var(--surface);border-right:1px solid var(--line);border-radius:0;transform:translateX(-102%);transition:transform .26s cubic-bezier(.32,.8,.3,1);will-change:transform}
+.menu-overlay.open .menu-panel{transform:translateX(0)}
+.menu-head{flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;padding:16px 14px 14px;border-bottom:1px solid var(--line)}
+.menu-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 10px 14px;min-height:0}
+.menu-foot{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--surface)}
+.menu-foot .menu-link{border:0;background:transparent;padding:8px 10px;font-size:13.5px;font-weight:600;margin:0;flex:1}
+.menu-foot .menu-link svg{width:15px;height:15px}
+.menu-mini{width:36px;height:36px;flex-shrink:0}
+.acc{border:0;background:transparent;margin-bottom:2px}
+.acc-head{font-size:14.5px;padding:11px 12px;font-weight:700;border-radius:10px}
+.acc-head .acc-chev{margin-left:auto}
+.acc-head .menu-dot{margin-left:0}
+.acc-body{transition:max-height .28s ease}
+.acc-body .acc{margin:0 0 2px 12px;border-left:2px solid var(--line)}
+.acc-head.sub{font-size:13.5px;font-weight:600;padding:10px 12px}
+.acc-head.disabled{margin:0 0 2px 12px;padding:10px 12px;font-size:13.5px;font-weight:500}
+.menu-tasks{grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:5px;padding:6px 10px 12px 14px}
+.menu-tasks a{padding:7px 2px;font-size:11px}

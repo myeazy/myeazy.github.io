@@ -87,15 +87,9 @@
     renderCatalog();
   }
 
-  // ===== Полноэкранное меню с аккордеонами =====
+  // ===== Меню-шторка слева: фикс. шапка/низ, свайпы, 2 аккордеона =====
   const menuBtn = $('.menu-btn');
   if (menuBtn) {
-    const subjects = [
-      { name: 'Информатика', slug: 'informatika', active: true },
-      { name: 'Математика', active: false },
-      { name: 'Русский язык', active: false },
-      { name: 'Физика', active: false },
-    ];
     const ov = document.createElement('div');
     ov.className = 'menu-overlay';
     ov.id = 'menu-overlay';
@@ -108,43 +102,45 @@
         </div>
         <div class="menu-scroll">
           <div class="acc open" data-acc="ege">
-            <button class="acc-head open" aria-expanded="true"><svg viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4Zm16 0h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4Z"/></svg><span class="acc-title">Каталог</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <button class="acc-head open" aria-expanded="true"><span class="acc-title">ЕГЭ</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
             <div class="acc-body open">
               <div class="acc" data-acc="subject">
-                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">ЕГЭ · Информатика</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">Информатика</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
                 <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/ege/informatika/${t.id}/"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
               </div>
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">ЕГЭ · Математика</span><span class="menu-soon">скоро</span></button>
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">ЕГЭ · Русский язык</span><span class="menu-soon">скоро</span></button>
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">ОГЭ</span><span class="menu-soon">скоро</span></button>
+              <button class="acc-head sub disabled" type="button"><span class="acc-title">Математика</span><span class="menu-soon">скоро</span></button>
+              <button class="acc-head sub disabled" type="button"><span class="acc-title">Русский язык</span><span class="menu-soon">скоро</span></button>
+              <button class="acc-head sub disabled" type="button"><span class="acc-title">Физика</span><span class="menu-soon">скоро</span></button>
             </div>
           </div>
-          <div class="menu-divider"></div>
-          <a class="menu-link" href="/info/"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></svg> О проекте</a>
+          <div class="acc" data-acc="oge">
+            <button class="acc-head disabled" aria-expanded="false" type="button"><span class="acc-title">ОГЭ</span><span class="menu-soon">скоро</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+          </div>
+        </div>
+        <div class="menu-foot">
           <a class="menu-link accent" href="/support/"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"/></svg> Поддержать</a>
-          <button class="menu-link as-btn" id="menu-theme"><svg viewBox="0 0 24 24"><use href="#i-moon"/></svg> Тема: <span class="menu-theme-state">${document.documentElement.dataset.theme === 'dark' ? 'Светлая' : 'Тёмная'}</span></button>
+          <a class="icon-button menu-mini" href="/info/" aria-label="О проекте"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></svg></a>
+          <button class="icon-button menu-mini" id="menu-theme" aria-label="Сменить тему"><svg viewBox="0 0 24 24"><use href="#i-moon"/></svg></button>
         </div>
       </div>`;
     document.body.appendChild(ov);
+    const panel = ov.querySelector('.menu-panel');
 
     const openMenu = () => { ov.hidden = false; menuBtn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden'; requestAnimationFrame(() => ov.classList.add('open')); };
-    const closeMenu = () => { ov.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; setTimeout(() => { ov.hidden = true; }, 220); };
+    const closeMenu = () => { ov.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; setTimeout(() => { ov.hidden = true; }, 240); };
     menuBtn.addEventListener('click', () => ov.hidden ? openMenu() : closeMenu());
     ov.querySelector('.menu-close').addEventListener('click', closeMenu);
     ov.addEventListener('click', e => { if (e.target === ov) closeMenu(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) closeMenu(); });
 
-    // Аккордеон: открытие одного закрывает соседей того же уровня
+    // Аккордеон: один открытый на уровне, корневой ЕГЭ не закрывается
     ov.querySelectorAll('.acc-head:not(.disabled)').forEach(head => {
       head.addEventListener('click', () => {
         const acc = head.parentElement;
         const body = acc.querySelector(':scope > .acc-body');
         if (!body) return;
-        const parentAcc = acc.parentElement.closest('.acc');
-        // запрет закрывать корневой ЕГЭ
         if (acc.dataset.acc === 'ege' && body.classList.contains('open')) return;
         const willOpen = !body.classList.contains('open');
-        // закрыть соседей
         [...acc.parentElement.children].forEach(sib => {
           if (sib !== acc && sib.classList.contains('acc')) {
             sib.querySelector(':scope > .acc-body')?.classList.remove('open');
@@ -160,6 +156,47 @@
     ov.querySelectorAll('.acc-head.disabled').forEach(b => b.addEventListener('click', () => window.showToast('Этот раздел скоро появится')));
     ov.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
     ov.querySelector('#menu-theme').addEventListener('click', e => toggleTheme(e.clientX, e.clientY));
+
+    // Свайпы: открытие от левого края, закрытие свайпом влево — с отслеживанием пальца
+    const W = () => panel.offsetWidth;
+    let drag = null;
+    const setX = dx => { panel.style.transition = 'none'; panel.style.transform = `translateX(${drag.from === -1 ? -100 + (100 * drag.dx / W()) : 0}%)`; };
+    document.addEventListener('touchstart', e => {
+      const x = e.touches[0].clientX, y = e.touches[0].clientY;
+      if (ov.hidden && x < 28) drag = { from: -1, startX: x, startY: y, dx: 0, active: false };
+      else if (!ov.hidden && ov.contains(e.target)) drag = { from: 0, startX: x, startY: y, dx: 0, active: false };
+      else drag = null;
+    }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (!drag) return;
+      const t = e.touches[0];
+      const dx = t.clientX - drag.startX, dy = t.clientY - drag.startY;
+      if (!drag.active) {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5) drag.active = true;
+        else if (Math.abs(dy) > 10) { drag = null; return; }
+        if (!drag?.active) return;
+        if (drag.from === -1) { ov.hidden = false; document.body.style.overflow = 'hidden'; ov.classList.add('open'); }
+      }
+      drag.dx = dx;
+      const w = W();
+      let px;
+      if (drag.from === -1) px = Math.min(0, -w + dx);        // открытие: -100% → 0
+      else px = Math.min(0, dx);                              // закрытие: 0 → -100%
+      panel.style.transition = 'none';
+      panel.style.transform = `translateX(${px}px)`;
+      ov.style.background = `rgba(14,15,16,${0.5 * (1 + px / w)})`;
+    }, { passive: true });
+    document.addEventListener('touchend', () => {
+      if (!drag || !drag.active) { drag = null; return; }
+      const w = W();
+      const opened = drag.from === -1 ? (drag.dx > w * 0.3) : (drag.dx > -w * 0.3);
+      panel.style.transition = '';
+      panel.style.transform = '';
+      ov.style.background = '';
+      if (opened) { if (drag.from === -1) { menuBtn.setAttribute('aria-expanded', 'true'); } }
+      else closeMenu();
+      drag = null;
+    }, { passive: true });
   }
 
   // Поиск (Ctrl+K)
