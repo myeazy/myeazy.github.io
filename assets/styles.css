@@ -357,3 +357,15 @@ body{touch-action:pan-y}
 /* Фикс: ОГЭ — корневой disabled не должен быть с отступом */
 .acc>.acc-head.disabled{margin-left:0}
 /* Свайп-зона шире на тачах */
+
+/* Hero: карточка задания вместо кода */
+.float-task{left:0;top:0;width:min(330px,88%);padding:16px;transform:rotate(-1.2deg)}
+.ft-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ft-badge{font:600 10px var(--mono);color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:99px}
+[data-theme=dark] .ft-badge{background:#33241c}
+.ft-subj{font-size:11px;color:#8b9490}
+.ft-question{font-size:12.5px;line-height:1.6;color:#c9cfcc;margin:0 0 12px}
+.ft-answer{display:flex;align-items:center;gap:8px;border-top:1px solid var(--dark-line);padding-top:10px;font-size:11px;color:#8b9490}
+.ft-answer strong{margin-left:auto;font:600 18px var(--mono);color:#c9e3d3}
+.ft-check{font-size:10px;color:#6fc79c;font-weight:700}
+.float-answer-num{font-size:28px}

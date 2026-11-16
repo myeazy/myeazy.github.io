@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f2ec">
-  <meta name="description" content="Понятные разборы заданий ЕГЭ по информатике: теория, алгоритм, код и тренировка с проверкой ответа.">
-  <title>EAZY — ЕГЭ по информатике без лишнего</title>
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg"><link rel="manifest" href="manifest.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="EAZY — понятные разборы заданий ЕГЭ и ОГЭ: теория, примеры, тренировка с проверкой ответа. Все предметы.">
+  <title>EAZY — ЕГЭ и ОГЭ без лишнего</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg"><link rel="manifest" href="manifest.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" href="assets/fonts.css"><link rel="stylesheet" href="assets/styles.css?v=11">
   <script>try{if(localStorage.getItem('yasno-theme')==='dark'||(!localStorage.getItem('yasno-theme')&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.dataset.theme='dark'}catch(e){}</script>
   <script defer src="assets/tasks.js?v=11"></script>
@@ -30,18 +30,13 @@
           <p class="hero-lead">Краткие разборы заданий, код и проверка ответов. Прочитал, вспомнил, решил, проверил — и пошёл дальше.</p>
           <div class="hero-actions"><a class="button button-light" href="#tasks">Выбрать задание <svg><use href="#i-arrow-right"/></svg></a><a class="button button-ghost" href="/ege/informatika/13/"><svg><use href="#i-play-small"/></svg> Посмотреть пример</a></div>
         </div>
-        <div class="hero-visual" aria-label="Пример разбора задания">
-          <div class="float-card float-code">
-            <div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>решение.py</span></div>
-            <pre><code><span class="c-purple">from</span> ipaddress <span class="c-purple">import</span> ip_network
-
-net = ip_network(<span class="c-string">'192.168.32.160/28'</span>,
-                 strict=<span class="c-purple">False</span>)
-
-<span class="c-muted"># Адреса для устройств</span>
-<span class="c-blue">print</span>(net.num_addresses - <span class="c-number">2</span>)</code></pre>
+        <div class="hero-visual" aria-label="Как устроен разбор">
+          <div class="float-card float-task">
+            <div class="ft-head"><span class="ft-badge">Задание 08</span><span class="ft-subj">Комбинаторика</span></div>
+            <p class="ft-question">Сколько слов длины 4 можно составить из букв А, Б, В, Г, если соседние буквы не совпадают?</p>
+            <div class="ft-answer"><span>Твой ответ</span><strong>108</strong><span class="ft-check">✓ Верно</span></div>
           </div>
-          <div class="float-card float-answer"><div class="float-answer-top"><span class="status-dot"></span>Ответ получен</div><div class="float-answer-num">14</div></div>
+          <div class="float-card float-answer"><div class="float-answer-top"><span class="status-dot"></span>Ответ проверен</div><div class="float-answer-num">4 · 3³</div></div>
           <div class="float-card float-tags"><span class="chip-tag">Информатика</span><span class="chip-tag">Математика</span><span class="chip-tag">Русский язык</span></div>
           <div class="float-card float-stat"><strong>27</strong><span>номеров<br>в киме</span></div>
         </div>

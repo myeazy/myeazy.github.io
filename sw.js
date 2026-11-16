@@ -1,4 +1,4 @@
-const CACHE = 'eazy-v9';
+const CACHE = 'eazy-v10';
 const SHELL = [
   './',
   './index.html',
@@ -11,11 +11,12 @@ const SHELL = [
   './assets/styles.css',
   './assets/task.css',
   './assets/fonts.css',
+  './404.html'',
   './assets/app.js',
   './assets/tasks.js',
   './assets/task.js',
   './assets/selects.js',
-  './assets/favicon.svg',
+  './assets/logo.svg',
   './manifest.webmanifest'
 ];
 
