@@ -52,7 +52,7 @@
       const items = DATA[key].items.filter(i => i.label.toLowerCase().includes(query));
       list.innerHTML = items.length ? items.map(i => `
         <button class="select-pop-item ${i.active ? 'active-item' : 'disabled'}" role="option" aria-selected="${i.active}">
-          ${i.label}${i.active ? '<span class="dot" title="Доступно"></span>' : '<span class="soon">скоро</span>'}
+          ${i.label}${i.active ? '' : '<span class="soon">скоро</span>'}
         </button>`).join('') : '<div class="select-pop-empty">Ничего не найдено</div>';
       list.querySelectorAll('.select-pop-item').forEach(el => el.addEventListener('click', () => {
         if (el.classList.contains('active-item')) closePop();

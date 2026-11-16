@@ -161,7 +161,7 @@
     const panelW = () => panel.offsetWidth;
     document.addEventListener('pointerdown', e => {
       if (ov.hidden) {
-        if (e.clientX <= 18) drag = { mode: 'open', x0: e.clientX, y0: e.clientY, active: false };
+        if (e.clientX <= 36) drag = { mode: 'open', x0: e.clientX, y0: e.clientY, active: false };
       } else if (panel.contains(e.target) || e.target === ov) {
         drag = { mode: 'close', x0: e.clientX, y0: e.clientY, active: false };
       }

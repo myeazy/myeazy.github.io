@@ -353,3 +353,7 @@ body{padding-bottom:0!important}
 /* свайп-зона: без полосы, разрешаем горизонтальные жесты на body */
 .edge-swipe{display:none}
 body{touch-action:pan-y}
+
+/* Фикс: ОГЭ — корневой disabled не должен быть с отступом */
+.acc>.acc-head.disabled{margin-left:0}
+/* Свайп-зона шире на тачах */
