@@ -102,10 +102,10 @@
         </div>
         <div class="menu-scroll">
           <div class="acc open" data-acc="ege">
-            <button class="acc-head open" aria-expanded="true"><span class="acc-title">ЕГЭ</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+            <button class="acc-head open" aria-expanded="true"><span class="acc-title">ЕГЭ</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
             <div class="acc-body open">
               <div class="acc" data-acc="subject">
-                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">Информатика</span><span class="menu-dot"></span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">Информатика</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
                 <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/ege/informatika/${t.id}/"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
               </div>
               <button class="acc-head sub disabled" type="button"><span class="acc-title">Математика</span><span class="menu-soon">скоро</span></button>
@@ -139,7 +139,6 @@
         const acc = head.parentElement;
         const body = acc.querySelector(':scope > .acc-body');
         if (!body) return;
-        if (acc.dataset.acc === 'ege' && body.classList.contains('open')) return;
         const willOpen = !body.classList.contains('open');
         [...acc.parentElement.children].forEach(sib => {
           if (sib !== acc && sib.classList.contains('acc')) {
@@ -157,46 +156,46 @@
     ov.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
     ov.querySelector('#menu-theme').addEventListener('click', e => toggleTheme(e.clientX, e.clientY));
 
-    // Свайпы: открытие от левого края, закрытие свайпом влево — с отслеживанием пальца
-    const W = () => panel.offsetWidth;
+    // Свайпы: открытие от левого края, закрытие влево — панель следует за пальцем
     let drag = null;
-    const setX = dx => { panel.style.transition = 'none'; panel.style.transform = `translateX(${drag.from === -1 ? -100 + (100 * drag.dx / W()) : 0}%)`; };
-    document.addEventListener('touchstart', e => {
-      const x = e.touches[0].clientX, y = e.touches[0].clientY;
-      if (ov.hidden && x < 28) drag = { from: -1, startX: x, startY: y, dx: 0, active: false };
-      else if (!ov.hidden && ov.contains(e.target)) drag = { from: 0, startX: x, startY: y, dx: 0, active: false };
-      else drag = null;
-    }, { passive: true });
-    document.addEventListener('touchmove', e => {
-      if (!drag) return;
-      const t = e.touches[0];
-      const dx = t.clientX - drag.startX, dy = t.clientY - drag.startY;
-      if (!drag.active) {
-        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5) drag.active = true;
-        else if (Math.abs(dy) > 10) { drag = null; return; }
-        if (!drag?.active) return;
-        if (drag.from === -1) { ov.hidden = false; document.body.style.overflow = 'hidden'; ov.classList.add('open'); }
+    const panelW = () => panel.offsetWidth;
+    document.addEventListener('pointerdown', e => {
+      if (ov.hidden) {
+        if (e.clientX <= 18) drag = { mode: 'open', x0: e.clientX, y0: e.clientY, active: false };
+      } else if (panel.contains(e.target) || e.target === ov) {
+        drag = { mode: 'close', x0: e.clientX, y0: e.clientY, active: false };
       }
-      drag.dx = dx;
-      const w = W();
-      let px;
-      if (drag.from === -1) px = Math.min(0, -w + dx);        // открытие: -100% → 0
-      else px = Math.min(0, dx);                              // закрытие: 0 → -100%
+    }, { passive: true });
+    document.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+      if (!drag.active) {
+        if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+        if (Math.abs(dx) < 10) return;
+        if (drag.mode === 'open' && dx > 0) { ov.hidden = false; ov.classList.add('open'); document.body.style.overflow = 'hidden'; drag.active = true; }
+        else if (drag.mode === 'close' && dx < 0) drag.active = true;
+        else return;
+      }
+      if (e.cancelable) e.preventDefault();
+      const w = panelW();
+      const px = drag.mode === 'open' ? Math.min(0, -w + dx) : Math.min(0, dx);
       panel.style.transition = 'none';
       panel.style.transform = `translateX(${px}px)`;
-      ov.style.background = `rgba(14,15,16,${0.5 * (1 + px / w)})`;
-    }, { passive: true });
-    document.addEventListener('touchend', () => {
-      if (!drag || !drag.active) { drag = null; return; }
-      const w = W();
-      const opened = drag.from === -1 ? (drag.dx > w * 0.3) : (drag.dx > -w * 0.3);
-      panel.style.transition = '';
-      panel.style.transform = '';
-      ov.style.background = '';
-      if (opened) { if (drag.from === -1) { menuBtn.setAttribute('aria-expanded', 'true'); } }
-      else closeMenu();
+    }, { passive: false });
+    const endDrag = e => {
+      if (!drag) return;
+      const wasActive = drag.active, dx = e.clientX - drag.x0, w = panelW();
+      panel.style.transition = ''; panel.style.transform = '';
+      if (wasActive) {
+        if (drag.mode === 'open') {
+          if (dx > w * 0.3) menuBtn.setAttribute('aria-expanded', 'true');
+          else closeMenu();
+        } else if (dx <= -w * 0.3) closeMenu();
+      }
       drag = null;
-    }, { passive: true });
+    };
+    document.addEventListener('pointerup', endDrag, { passive: true });
+    document.addEventListener('pointercancel', () => { drag = null; }, { passive: true });
   }
 
   // Поиск (Ctrl+K)
