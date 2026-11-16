@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f4f2ec"><meta name="robots" content="noindex"><title>404 — страница потерялась | EAZY</title><link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"><link rel="manifest" href="/manifest.webmanifest"><meta name="mobile-web-app-capable" content="yes"><link rel="stylesheet" href="/assets/fonts.css"><link rel="stylesheet" href="/assets/styles.css?v=10"><script>try{if(localStorage.getItem('yasno-theme')==='dark'||(!localStorage.getItem('yasno-theme')&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.dataset.theme='dark'}catch(e){}</script><script defer src="/assets/tasks.js?v=10"></script><script defer src="/assets/app.js?v=10"></script></head>
+<body class="page-404">
+<header class="topbar"><div class="container nav-wrap">
+  <button class="icon-button menu-btn" aria-label="Меню" aria-expanded="false"><svg><use href="#i-menu"/></svg></button>
+  <a class="brand brand-center" href="/app/" aria-label="EAZY — каталог"><span>EAZY<span class="brand-dot">.</span></span></a>
+  <span class="nav-spacer" aria-hidden="true"></span>
+</div></header>
+<main class="container notfound-wrap">
+  <div class="notfound-card">
+    <div class="notfound-code">404</div>
+    <h1 id="notfound-title">Страница потерялась</h1>
+    <p class="notfound-phrase" id="notfound-phrase">…</p>
+    <div class="notfound-actions">
+      <a class="button button-primary" href="/app/">В каталог заданий</a>
+      <button class="button button-secondary" id="notfound-more" type="button">Ещё фразу</button>
+    </div>
+    <p class="notfound-hint">Кстати, задание 13 само себя не решит.</p>
+  </div>
+</main>
+<script>
+(function(){
+  var phrases = [
+    'Ошибка 404 — это не ошибка, это неизведанная территория. Как задание 27 перед первым прочтением.',
+    'Даже лучшие теряются. Главное — вернуться и дорешать.',
+    'Этой страницы нет. Зато есть 27 заданий, которые ждут тебя.',
+    'Потеряться на сайте не страшно. Страшно потеряться в маске подсети.',
+    'Ты зашёл туда, где пусто. Как в ответе, который забыл записать в бланк.',
+    'Каждый, кто сдал на 100, хоть раз попадал на 404. Почти наверняка.',
+    'Не баг, а фича: ты нашёл секретную комнату мотивации.',
+    'Сделай глубокий вдох. Вернись. Реши одну задачу. Уже прогресс.',
+    'Дорогу осилит идущий, а страницу найдёт вернувшийся в каталог.',
+    'Здесь ничего нет, но твой балл на ЕГЭ ещё не предопределён. Вперёд.'
+  ];
+  var el = document.getElementById('notfound-phrase');
+  var last = -1;
+  function show(){
+    var i; do { i = Math.floor(Math.random()*phrases.length); } while (i === last);
+    last = i;
+    el.classList.remove('phrase-in');
+    void el.offsetWidth;
+    el.textContent = phrases[i];
+    el.classList.add('phrase-in');
+  }
+  document.getElementById('notfound-more').addEventListener('click', show);
+  show();
+})();
+</script>
+<style>
+.notfound-wrap{display:grid;place-items:center;min-height:calc(100dvh - 56px);padding:24px 0}
+.notfound-card{text-align:center;max-width:520px;padding:20px}
+.notfound-code{font:400 clamp(90px,24vw,160px)/1 'Zero Cool',var(--font);color:var(--accent);letter-spacing:4px;margin-bottom:6px;animation:float404 4s ease-in-out infinite}
+@keyframes float404{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.notfound-card h1{font-size:clamp(22px,5vw,30px);margin:0 0 12px}
+.notfound-phrase{font-size:15px;line-height:1.7;min-height:3.4em;color:var(--muted)}
+.phrase-in{animation:phraseIn .35s ease}
+@keyframes phraseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.notfound-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 14px}
+.notfound-hint{font:11px var(--mono);color:var(--muted);margin:0}
+</style>
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg"><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol></svg>
+</body></html>
