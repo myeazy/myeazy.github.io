@@ -26,16 +26,35 @@
       $$('.theme-toggle').forEach(b => b.innerHTML = icon(dark ? 'sun' : 'moon'));
     };
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || !document.startViewTransition) { applyTheme(dark); updateIcons(); return; }
-    const vt = document.startViewTransition(() => { applyTheme(dark); updateIcons(); });
-    vt.ready.then(() => {
-      const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
-      const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
-      document.documentElement.animate(
-        { clipPath: [`circle(0px at ${cx}px ${cy}px)`, `circle(${r}px at ${cx}px ${cy}px)`] },
-        { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)', pseudoElement: '::view-transition-new(root)' }
-      );
-    }).catch(() => {});
+    const isYandex = /YaBrowser/i.test(navigator.userAgent);
+    if (reduced) { applyTheme(dark); updateIcons(); return; }
+    if (!isYandex && document.startViewTransition) {
+      const vt = document.startViewTransition(() => { applyTheme(dark); updateIcons(); });
+      vt.ready.then(() => {
+        const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
+        const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+        document.documentElement.animate(
+          { clipPath: [`circle(0px at ${cx}px ${cy}px)`, `circle(${r}px at ${cx}px ${cy}px)`] },
+          { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)', pseudoElement: '::view-transition-new(root)' }
+        );
+      }).catch(() => {});
+      return;
+    }
+    // Надёжный путь (Яндекс и пр.): круг из точки нажатия + затухание
+    const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
+    const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+    const clip = document.createElement('div');
+    clip.className = 'theme-reveal';
+    clip.dataset.to = dark ? 'dark' : 'light';
+    document.body.appendChild(clip);
+    const anim = clip.animate(
+      [{ clipPath: `circle(0px at ${cx}px ${cy}px)` }, { clipPath: `circle(${r}px at ${cx}px ${cy}px)` }],
+      { duration: 450, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }
+    );
+    anim.onfinish = () => {
+      applyTheme(dark); updateIcons();
+      clip.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }).onfinish = () => clip.remove();
+    };
   }
   window.toggleTheme = toggleTheme;
 
