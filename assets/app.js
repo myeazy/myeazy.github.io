@@ -39,7 +39,7 @@
     const progress = storage.get(`answers-${task.id}`, {});
     const solved = Object.values(progress).filter(item => item.correct).length;
     const card = task.ready ? 'a' : 'article';
-    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="task.html?id=${task.id}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''} ${task.ready ? `data-task-id="${task.id}"` : ''}>
+    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="/ege/informatika/${task.id}/" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''} ${task.ready ? `data-task-id="${task.id}"` : ''}>
       <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span>${completed ? `<span class="task-status" title="Разбор пройден">${icon('check')}</span>` : ''}</div>
       <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
       <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
@@ -90,7 +90,7 @@
     const query = input.value.trim().toLowerCase();
     matches = window.TASKS.filter(task => [task.id, task.title, task.short, ...(task.tags || [])].join(' ').toLowerCase().includes(query)).slice(0, 8);
     selected = Math.min(selected, Math.max(0, matches.length - 1));
-    results.innerHTML = matches.length ? matches.map((task, i) => `<a class="search-result ${i === selected ? 'selected' : ''}" data-result-index="${i}" href="task.html?id=${task.id}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+    results.innerHTML = matches.length ? matches.map((task, i) => `<a class="search-result ${i === selected ? 'selected' : ''}" data-result-index="${i}" href="/ege/informatika/${task.id}/"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
   };
   const openSearch = () => {
     if (!overlay) return;
@@ -110,27 +110,24 @@
     if (!overlay || overlay.hidden) return;
     if (event.key === 'Escape') closeSearch();
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); selected = (selected + (event.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length; renderSearch(); }
-    if (event.key === 'Enter' && matches[selected]) window.location.href = `task.html?id=${matches[selected].id}`;
+    if (event.key === 'Enter' && matches[selected]) window.location.href = `/ege/informatika/${matches[selected].id}/`;
   });
-  // Нижняя панель вкладок (app-style навигация)
-  (() => {
-    if (document.body.classList.contains('no-tabbar')) return;
-    const path = location.pathname.split('/').pop() || 'index.html';
-    const tabs = [
-      { href: 'index.html', label: 'Главная', icon: '<path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1Z"/>' },
-      { label: 'Каталог', href: 'tasks.html', icon: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>' },
-      { label: 'О проекте', href: 'about.html', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>' },
-    ];
-    const bar = document.createElement('nav');
-    bar.className = 'tabbar';
-    bar.setAttribute('aria-label', 'Нижняя навигация');
-    bar.innerHTML = tabs.map(t => {
-      const href = t.href || '#tasks';
-      const active = (path === t.href) || (path === 'task.html' && t.href === 'tasks.html') || (path === '' && t.href === 'index.html');
-      return `<a href="${href}" class="${active ? 'active' : ''}"><svg viewBox="0 0 24 24">${t.icon}</svg><span>${t.label}</span></a>`;
-    }).join('');
-    document.body.appendChild(bar);
-  })();
+
+  // Бургер-меню
+  const menuBtn = $('.menu-btn');
+  const menuOverlay = $('#menu-overlay');
+  if (menuBtn && menuOverlay) {
+    const closeMenu = () => { menuOverlay.hidden = true; menuBtn.setAttribute('aria-expanded','false'); document.body.style.overflow=''; };
+    menuBtn.addEventListener('click', () => {
+      const open = menuOverlay.hidden;
+      menuOverlay.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    menuOverlay.addEventListener('click', e => { if (e.target === menuOverlay) closeMenu(); });
+    menuOverlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    menuOverlay.querySelector('.menu-theme')?.addEventListener('click', () => $('.theme-toggle')?.click());
+  }
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

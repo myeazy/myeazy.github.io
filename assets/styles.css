@@ -219,3 +219,24 @@ body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 @media(min-width:761px){.tabbar{display:none}body{padding-bottom:0}}
 /* PWA: учитываем вырезы сверху */
 .topbar{padding-top:env(safe-area-inset-top,0px)}
+
+/* ===== Шапка: бургер слева, лого по центру ===== */
+.nav-wrap{position:relative;justify-content:space-between}
+.brand-center{position:absolute;left:50%;transform:translateX(-50%)}
+.menu-btn{border-radius:99px}
+/* ===== Бургер-меню ===== */
+.menu-overlay{position:fixed;inset:0;z-index:90;background:#10100e99;backdrop-filter:blur(3px)}
+.menu-panel{position:absolute;top:64px;left:12px;width:min(320px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 70px #0006;padding:10px;animation:menuIn .18s ease;max-height:calc(100dvh - 80px);overflow-y:auto}
+@keyframes menuIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+.menu-section{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:10px 12px 6px}
+.menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border-radius:10px;font-size:14.5px;font-weight:600;color:var(--ink);border:0;background:transparent;text-align:left}
+.menu-item:hover:not(.disabled){background:var(--surface-2)}
+.menu-item.disabled{color:var(--muted);font-weight:500;cursor:default}
+.menu-item svg{width:16px;height:16px}
+.menu-dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--green)}
+.menu-soon{margin-left:auto;font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px}
+.menu-divider{height:1px;background:var(--line);margin:8px 6px}
+.menu-support{color:var(--accent)}
+.menu-support svg{color:var(--accent)}
+/* убрать отступ под таббар (его больше нет) */
+body{padding-bottom:0!important}

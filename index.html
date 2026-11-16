@@ -14,13 +14,25 @@
 </head>
 <body class="home-page">
   <a class="skip-link" href="#main">К содержанию</a>
-  <header class="topbar">
-    <div class="container nav-wrap">
-      <a class="brand" href="index.html" aria-label="EAZY — главная"><span>EAZY<span class="brand-dot">.</span></span></a>
-      <nav class="main-nav" aria-label="Основная навигация"><a class="active" href="index.html">Главная</a><a href="tasks.html">Каталог</a><a href="about.html">О проекте</a></nav>
-      <div class="nav-actions"><button class="icon-button theme-toggle" aria-label="Включить тёмную тему"><svg><use href="#i-moon"/></svg></button></div>
-    </div>
-  </header>
+  <header class="topbar"><div class="container nav-wrap">
+  <button class="icon-button menu-btn" aria-label="Меню" aria-expanded="false" aria-controls="menu-overlay"><svg><use href="#i-menu"/></svg></button>
+  <a class="brand brand-center" href="/" aria-label="EAZY — главная"><span>EAZY<span class="brand-dot">.</span></span></a>
+  <button class="icon-button theme-toggle" aria-label="Сменить тему"><svg><use href="#i-moon"/></svg></button>
+</div></header>
+<div class="menu-overlay" id="menu-overlay" hidden>
+  <nav class="menu-panel" aria-label="Главное меню">
+    <p class="menu-section">Каталог</p>
+    <a class="menu-item" href="/app/">ЕГЭ · Информатика <span class="menu-dot"></span></a>
+    <span class="menu-item disabled">ЕГЭ · Математика <span class="menu-soon">скоро</span></span>
+    <span class="menu-item disabled">ЕГЭ · Русский язык <span class="menu-soon">скоро</span></span>
+    <span class="menu-item disabled">ОГЭ <span class="menu-soon">скоро</span></span>
+    <div class="menu-divider"></div>
+    <a class="menu-item" href="/info/">О проекте</a>
+    <a class="menu-item menu-support" href="/info/#support">Поддержать <svg><use href="#i-heart"/></svg></a>
+    <div class="menu-divider"></div>
+    <button class="menu-item menu-theme" type="button"><svg><use href="#i-moon"/></svg> Переключить тему</button>
+  </nav>
+</div>
   <main id="main">
     <section class="hero container">
       <div class="hero-panel">
@@ -29,7 +41,7 @@
           <div class="eyebrow"><span class="subject-badge">ЕГЭ</span><span>Все предметы</span><span class="eyebrow-sep">/</span><span class="mono-dim">2027</span></div>
           <h1>Сложные задания.<br><span class="accent-text">Понятные решения.</span></h1>
           <p class="hero-lead">Теория без воды, пошаговые разборы и тренировка с мгновенной проверкой. Всё, чтобы понять, а не заучить.</p>
-          <div class="hero-actions"><a class="button button-light" href="#tasks">Выбрать задание <svg><use href="#i-arrow-right"/></svg></a><a class="button button-ghost" href="task.html?id=13"><svg><use href="#i-play-small"/></svg> Посмотреть пример</a></div>
+          <div class="hero-actions"><a class="button button-light" href="#tasks">Выбрать задание <svg><use href="#i-arrow-right"/></svg></a><a class="button button-ghost" href="/ege/informatika/13/"><svg><use href="#i-play-small"/></svg> Посмотреть пример</a></div>
         </div>
         <div class="hero-visual" aria-label="Пример разбора задания">
           <div class="float-card float-code">
@@ -52,11 +64,11 @@ net = ip_network(<span class="c-string">'192.168.32.160/28'</span>,
     <section class="stats-strip"><div class="container stats-inner"><div><strong>27</strong><span>номеров в киме</span></div><div><strong>03</strong><span>полных разбора уже здесь</span></div><div><strong>100<span>%</span></strong><span>концентрации на сути</span></div><div class="stats-note"><svg><use href="#i-book"/></svg><span>Учи систему, а не отдельные ответы.</span></div></div></section>
 
     <section class="tasks-section container" id="tasks">
-      <div class="section-heading"><div><span class="section-kicker">/ Сейчас доступно</span><h2>Информатика</h2><p>Каждый разбор — самостоятельный мини-урок: теория, пример, код, практика.</p></div><a class="text-link" href="tasks.html">Все 27 заданий <svg><use href="#i-arrow-right"/></svg></a></div>
+      <div class="section-heading"><div><span class="section-kicker">/ Сейчас доступно</span><h2>Информатика</h2><p>Каждый разбор — самостоятельный мини-урок: теория, пример, код, практика.</p></div><a class="text-link" href="/app/">Все 27 заданий <svg><use href="#i-arrow-right"/></svg></a></div>
       <div class="task-filters" id="home-filters" aria-label="Фильтр заданий"><button class="filter-chip active" data-filter="all">Все задания</button><button class="filter-chip" data-filter="theory">Теория и алгоритмы</button><button class="filter-chip" data-filter="code">Программирование</button><button class="filter-chip" data-filter="high">Повышенная сложность</button></div>
       <div class="task-grid" id="home-task-grid"></div>
       <div class="empty-state compact" id="home-empty" hidden><h3>В этой категории пока тихо</h3><p>Посмотри все задания или выбери другую категорию.</p><button class="button button-secondary" id="reset-home-filter">Показать все</button></div>
-      <div class="section-bottom-link"><a class="button button-secondary" href="tasks.html">Открыть весь каталог <svg><use href="#i-arrow-right"/></svg></a></div>
+      <div class="section-bottom-link"><a class="button button-secondary" href="/app/">Открыть весь каталог <svg><use href="#i-arrow-right"/></svg></a></div>
     </section>
 
     <section class="method-section" id="method"><div class="container">
@@ -67,11 +79,11 @@ net = ip_network(<span class="c-string">'192.168.32.160/28'</span>,
         <article class="method-row"><span class="method-number">03</span><div><h3>Пойми алгоритм</h3><p>Комментированный код на Python и ручной способ — чтобы решать уверенно.</p></div><svg><use href="#i-code"/></svg></article>
         <article class="method-row"><span class="method-number">04</span><div><h3>Закрепи практикой</h3><p>Реши похожие задачи, проверь ответ и разбери свою ошибку.</p></div><svg><use href="#i-target"/></svg></article>
       </div>
-      <div class="method-cta"><div class="hero-dots" aria-hidden="true"></div><div><span class="small-label">Попробуй прямо сейчас</span><h3>Начнём с задания 13?<br>Оно проще, чем кажется.</h3></div><a class="button button-light" href="task.html?id=13">Открыть разбор <svg><use href="#i-arrow-right"/></svg></a></div>
+      <div class="method-cta"><div class="hero-dots" aria-hidden="true"></div><div><span class="small-label">Попробуй прямо сейчас</span><h3>Начнём с задания 13?<br>Оно проще, чем кажется.</h3></div><a class="button button-light" href="/ege/informatika/13/">Открыть разбор <svg><use href="#i-arrow-right"/></svg></a></div>
     </div></section>
   </main>
-  <footer class="footer"><div class="container footer-inner"><a class="brand" href="index.html"><span>EAZY<span class="brand-dot">.</span></span></a><p>Образовательный проект для тех,<br>кто хочет разобраться.</p><div class="footer-links"><a href="tasks.html">Все задания</a><a href="about.html">О проекте</a><a href="https://fipi.ru/ege/demoversii-specifikacii-kodifikatory" target="_blank" rel="noopener noreferrer">ФИПИ ↗</a></div><span class="footer-copy">Сделано с вниманием к сути.</span></div></footer>
+  <footer class="footer"><div class="container footer-inner"><a class="brand" href="/"><span>EAZY<span class="brand-dot">.</span></span></a><p>Образовательный проект для тех,<br>кто хочет разобраться.</p><div class="footer-links"><a href="/app/">Все задания</a><a href="/info/">О проекте</a><a href="https://fipi.ru/ege/demoversii-specifikacii-kodifikatory" target="_blank" rel="noopener noreferrer">ФИПИ ↗</a></div><span class="footer-copy">Сделано с вниманием к сути.</span></div></footer>
   <div class="search-overlay" id="search-overlay" hidden><div class="search-modal" role="dialog" aria-modal="true" aria-label="Поиск по заданиям"><div class="search-input-wrap"><svg><use href="#i-search"/></svg><input id="global-search" type="search" placeholder="Номер, тема или ключевое слово…" autocomplete="off"><button class="modal-close" aria-label="Закрыть поиск">Esc</button></div><div class="search-results" id="search-results"></div><div class="search-hint"><span>↑↓ — выбрать</span><span>Enter — открыть</span><span>Esc — закрыть</span></div></div></div>
-  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg"><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol><symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4Zm16 0h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4Z"/></symbol><symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3Z"/></symbol><symbol id="i-play-small" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></symbol><symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-2-13-4 16"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol></svg>
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg"><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol><symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4Zm16 0h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4Z"/></symbol><symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3Z"/></symbol><symbol id="i-play-small" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></symbol><symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-2-13-4 16"/></symbol><symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"/></symbol></svg>
 </body>
 </html>

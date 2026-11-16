@@ -1,7 +1,9 @@
 (() => {
   'use strict';
   const { $, icon, escapeHtml, storage } = window.Yasno;
-  const id = Number(new URLSearchParams(location.search).get('id'));
+  let id = Number(new URLSearchParams(location.search).get('id'));
+  const m = location.pathname.match(/\/ege\/([a-z-]+)\/(\d+)/);
+  if (m) id = Number(m[2]);
   const task = window.TASKS.find(t => t.id === id);
   const root = $('#lesson-content');
   $('#breadcrumb-task').textContent = task ? `Задание ${task.id}` : 'Не найдено';
@@ -35,13 +37,13 @@
 
   function render() {
     if (!task) {
-      root.innerHTML = `<div class="empty-state"><h3>Такого задания нет</h3><p>Проверь ссылку или выбери номер из каталога.</p><a class="button button-primary" href="tasks.html">К каталогу</a></div>`;
+      root.innerHTML = `<div class="empty-state"><h3>Такого задания нет</h3><p>Проверь ссылку или выбери номер из каталога.</p><a class="button button-primary" href="/app/">К каталогу</a></div>`;
       document.title = 'Задание не найдено — EAZY';
       return;
     }
     document.title = `Задание ${task.id}: ${task.title} — EAZY`;
     if (!task.ready) {
-      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Задание ${task.id}. ${escapeHtml(task.title)}</h2><p>${escapeHtml(task.short)}.<br>Полный разбор уже в работе — загляни позже, а пока посмотри готовые номера.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="task.html?id=8">Открыть задание 8</a><a class="button button-secondary" href="tasks.html">Все задания</a></div></div>`;
+      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Задание ${task.id}. ${escapeHtml(task.title)}</h2><p>${escapeHtml(task.short)}.<br>Полный разбор уже в работе — загляни позже, а пока посмотри готовые номера.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="/ege/informatika/8/">Открыть задание 8</a><a class="button button-secondary" href="/app/">Все задания</a></div></div>`;
       return;
     }
     const next = window.TASKS.find(t => t.ready && t.id > task.id) || window.TASKS.find(t => t.ready);
