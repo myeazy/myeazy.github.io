@@ -87,8 +87,34 @@
     renderCatalog();
   }
 
+  const taskMatches = query => {
+    const q = query.trim().toLowerCase();
+    return window.TASKS.filter(t => [t.id, t.title, t.short, ...(t.tags || [])].join(' ').toLowerCase().includes(q));
+  };
+  const resultRow = task => `<a class="search-result" href="/task/?id=${task.id}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`;
+
   const menuBtn = $('.menu-btn');
   if (menuBtn) {
+    const CHEV = '<svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
+    const menuExams = window.CATALOG.map(exam => {
+      if (!exam.active) {
+        return `<div class="acc" data-acc="${exam.id}">
+          <button class="acc-head disabled" type="button"><span class="acc-title">${exam.label}</span><span class="menu-soon">скоро</span>${CHEV}</button>
+        </div>`;
+      }
+      const subjects = exam.subjects.filter(s => s.inMenu).map(s => {
+        if (!s.active) return `<button class="acc-head sub disabled" type="button"><span class="acc-title">${s.name}</span><span class="menu-soon">скоро</span></button>`;
+        return `<div class="acc" data-acc="${s.id}">
+          <button class="acc-head sub" aria-expanded="false"><span class="acc-title">${s.name}</span>${CHEV}</button>
+          <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/task/?id=${t.id}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
+        </div>`;
+      }).join('');
+      return `<div class="acc open" data-acc="${exam.id}">
+        <button class="acc-head open" aria-expanded="true"><span class="acc-title">${exam.label}</span>${CHEV}</button>
+        <div class="acc-body open">${subjects}</div>
+      </div>`;
+    }).join('');
+
     const ov = document.createElement('div');
     ov.className = 'menu-overlay';
     ov.id = 'menu-overlay';
@@ -99,22 +125,10 @@
           <div class="menu-brand"><a class="menu-logo" href="/app/">EAZY<span class="brand-dot">.</span></a><span class="menu-tagline">Every Answer Zips to You</span></div>
           <button class="icon-button menu-close" aria-label="Закрыть меню"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
+        <div class="menu-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="menu-search-input" type="search" placeholder="Найти задание…" autocomplete="off" aria-label="Поиск по заданиям"></div>
         <div class="menu-scroll">
-          <div class="acc open" data-acc="ege">
-            <button class="acc-head open" aria-expanded="true"><span class="acc-title">ЕГЭ</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
-            <div class="acc-body open">
-              <div class="acc" data-acc="subject">
-                <button class="acc-head sub" aria-expanded="false"><span class="acc-title">Информатика</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
-                <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/task/?id=${t.id}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
-              </div>
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">Математика</span><span class="menu-soon">скоро</span></button>
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">Русский язык</span><span class="menu-soon">скоро</span></button>
-              <button class="acc-head sub disabled" type="button"><span class="acc-title">Физика</span><span class="menu-soon">скоро</span></button>
-            </div>
-          </div>
-          <div class="acc" data-acc="oge">
-            <button class="acc-head disabled" aria-expanded="false" type="button"><span class="acc-title">ОГЭ</span><span class="menu-soon">скоро</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
-          </div>
+          <div class="menu-results" id="menu-results" hidden></div>
+          <div class="menu-nav" id="menu-nav">${menuExams}</div>
         </div>
         <div class="menu-foot">
           <a class="menu-link accent" href="/support/"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"/></svg> Поддержать</a>
@@ -155,7 +169,32 @@
       const b = e.currentTarget.getBoundingClientRect();
       toggleTheme(b.left + b.width / 2, b.top + b.height / 2);
     });
+
+    const menuSearch = ov.querySelector('#menu-search-input');
+    const menuResults = ov.querySelector('#menu-results');
+    const menuNav = ov.querySelector('#menu-nav');
+    menuSearch.addEventListener('input', () => {
+      if (!menuSearch.value.trim()) { menuResults.hidden = true; menuNav.hidden = false; return; }
+      const found = taskMatches(menuSearch.value).slice(0, 12);
+      menuResults.innerHTML = found.length ? found.map(resultRow).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+      menuResults.hidden = false;
+      menuNav.hidden = true;
+      menuResults.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    });
+
     applyTheme(document.documentElement.dataset.theme === 'dark');
+  }
+
+  const shareBtn = $('#share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      const data = { title: 'EAZY — разборы ЕГЭ', text: 'Понятные разборы заданий ЕГЭ: теория, примеры, код и тренировка с проверкой ответа.', url: 'https://myeazy.github.io/' };
+      try {
+        if (navigator.share) { await navigator.share(data); return; }
+        await navigator.clipboard.writeText(data.url);
+        window.showToast('Ссылка скопирована — отправь друзьям');
+      } catch (e) { if (e && e.name !== 'AbortError') window.showToast('Не получилось — скопируй ссылку из адресной строки'); }
+    });
   }
 
   const overlay = $('#search-overlay');
@@ -164,10 +203,9 @@
     const results = $('#search-results');
     let selected = 0, matches = [], previousFocus;
     const renderSearch = () => {
-      const query = input.value.trim().toLowerCase();
-      matches = window.TASKS.filter(task => [task.id, task.title, task.short, ...(task.tags || [])].join(' ').toLowerCase().includes(query)).slice(0, 8);
+      matches = taskMatches(input.value).slice(0, 8);
       selected = Math.min(selected, Math.max(0, matches.length - 1));
-      results.innerHTML = matches.length ? matches.map((task, i) => `<a class="search-result ${i === selected ? 'selected' : ''}" href="/task/?id=${task.id}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+      results.innerHTML = matches.length ? matches.map((task, i) => resultRow(task).replace('class="search-result"', `class="search-result ${i === selected ? 'selected' : ''}'`)).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
     };
     const openSearch = () => { previousFocus = document.activeElement; overlay.hidden = false; document.body.style.overflow = 'hidden'; input.value = ''; selected = 0; renderSearch(); input.focus(); };
     const closeSearch = () => { overlay.hidden = true; document.body.style.overflow = ''; previousFocus?.focus(); };
