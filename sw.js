@@ -1,13 +1,11 @@
-const CACHE = 'eazy-v13';
+const CACHE = 'eazy-v14';
 const SHELL = [
   './',
   './index.html',
   './app/',
   './info/',
   './support/',
-  './ege/informatika/8/',
-  './ege/informatika/13/',
-  './ege/informatika/25/',
+  './task/',
   './assets/styles.css',
   './assets/task.css',
   './assets/fonts.css',
