@@ -197,3 +197,12 @@ p{color:var(--muted)}
 .theme-reveal[data-to=light]{background:#f4f2ec}
 ::view-transition-old(root){animation:none}
 ::view-transition-new(root){animation:none;mix-blend-mode:normal}
+
+.brand-banner{margin:18px 0 6px}
+.brand-banner img{width:100%;border-radius:14px;border:1px solid var(--line)}
+.brand-square{margin:18px 0 6px;text-align:center}
+.brand-square img{width:min(300px,72vw);border-radius:18px;border:1px solid var(--line)}
+.brand-gif-light{display:block}
+.brand-gif-dark{display:none}
+[data-theme=dark] .brand-gif-light{display:none}
+[data-theme=dark] .brand-gif-dark{display:block}
