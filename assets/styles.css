@@ -156,7 +156,7 @@ p{color:var(--muted)}
   .hero-actions .button{flex:1 1 150px}
   .footer p{display:none}
 }
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 .menu-overlay{position:fixed;inset:0;z-index:100;background:#0e0f1080;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .22s ease;touch-action:none}
 .menu-overlay.open{opacity:1}
@@ -183,7 +183,7 @@ p{color:var(--muted)}
 .acc-body .acc{margin:0 0 2px 12px;border-left:2px solid var(--line);background:var(--bg);overflow:hidden}
 .menu-soon{margin-left:auto;font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px}
 .menu-tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:5px;padding:6px 10px 12px 14px}
-.menu-tasks a{text-align:center;padding:7px 2px;border:1px solid var(--line);border-radius:9px;font:600 11px var(--mono);color:var(--ink);transition:border-color .15s,color .15s}
+.menu-tasks a{text-align:center;padding:7px 2px;border:1px solid var(--line);border-radius:9px;font:600 11px var(--mono);color:var(--ink);transition:border-color .15s,color .15s,transform .15s}
 .menu-tasks a:hover{border-color:var(--accent);color:var(--accent)}
 .menu-tasks a.off{opacity:.4;pointer-events:none}
 .menu-link{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;font-size:14px;font-weight:700;color:var(--ink);border:1px solid var(--line);border-radius:14px;background:var(--surface);margin-bottom:8px;font-family:inherit;text-align:left;cursor:pointer}
@@ -206,3 +206,38 @@ p{color:var(--muted)}
 .brand-gif-dark{display:none}
 [data-theme=dark] .brand-gif-light{display:none}
 [data-theme=dark] .brand-gif-dark{display:block}
+
+.action-list{display:flex;flex-direction:column;gap:8px;margin:22px 0 30px}
+.action-row{display:flex;align-items:center;gap:14px;width:100%;padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);text-align:left;font-family:inherit;cursor:pointer;transition:border-color .15s,transform .15s}
+.action-row:hover{border-color:var(--accent);transform:translateX(4px)}
+.action-ico{flex-shrink:0;width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:var(--accent-soft);color:var(--accent)}
+.action-ico svg{width:18px;height:18px}
+.action-row-text{flex:1;min-width:0}
+.action-row-text strong{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.action-row-text span{display:block;font-size:12px;color:var(--muted);line-height:1.5;margin-top:1px}
+.action-arrow{flex-shrink:0;color:var(--muted);transition:color .15s,transform .15s}
+.action-row:hover .action-arrow{color:var(--accent);transform:translateX(2px)}
+
+.menu-search{flex-shrink:0;display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.menu-search svg{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+.menu-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font-size:14px;font-family:inherit}
+.menu-search input::placeholder{color:var(--muted)}
+.menu-results{padding:6px}
+
+.button:active{transform:scale(.97)}
+.float-card{animation:floatY 7s ease-in-out infinite}
+.float-answer{animation-delay:-2.5s}
+.float-tags{animation-delay:-1.2s}
+.float-stat{animation-delay:-4.5s}
+@keyframes floatY{0%,100%{translate:0 0}50%{translate:0 -8px}}
+.lesson-section{animation:riseIn .45s ease both}
+.lesson-section:nth-of-type(2){animation-delay:.06s}
+.lesson-section:nth-of-type(3){animation-delay:.12s}
+.lesson-section:nth-of-type(4){animation-delay:.18s}
+.lesson-section:nth-of-type(5){animation-delay:.24s}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.search-modal{animation:searchIn .18s ease}
+@keyframes searchIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+.menu-link{transition:background .15s,transform .15s}
+.menu-link:hover{transform:translateX(3px)}
+.menu-tasks a:hover{transform:translateY(-2px)}
