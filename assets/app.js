@@ -63,7 +63,7 @@
 
   function taskCard(task) {
     const card = task.ready ? 'a' : 'article';
-    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="/ege/informatika/${task.id}/" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
+    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="/task/?id=${task.id}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
       <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
       <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
       <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
@@ -105,7 +105,7 @@
             <div class="acc-body open">
               <div class="acc" data-acc="subject">
                 <button class="acc-head sub" aria-expanded="false"><span class="acc-title">Информатика</span><svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
-                <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/ege/informatika/${t.id}/"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
+                <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/task/?id=${t.id}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
               </div>
               <button class="acc-head sub disabled" type="button"><span class="acc-title">Математика</span><span class="menu-soon">скоро</span></button>
               <button class="acc-head sub disabled" type="button"><span class="acc-title">Русский язык</span><span class="menu-soon">скоро</span></button>
@@ -167,7 +167,7 @@
       const query = input.value.trim().toLowerCase();
       matches = window.TASKS.filter(task => [task.id, task.title, task.short, ...(task.tags || [])].join(' ').toLowerCase().includes(query)).slice(0, 8);
       selected = Math.min(selected, Math.max(0, matches.length - 1));
-      results.innerHTML = matches.length ? matches.map((task, i) => `<a class="search-result ${i === selected ? 'selected' : ''}" href="/ege/informatika/${task.id}/"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+      results.innerHTML = matches.length ? matches.map((task, i) => `<a class="search-result ${i === selected ? 'selected' : ''}" href="/task/?id=${task.id}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
     };
     const openSearch = () => { previousFocus = document.activeElement; overlay.hidden = false; document.body.style.overflow = 'hidden'; input.value = ''; selected = 0; renderSearch(); input.focus(); };
     const closeSearch = () => { overlay.hidden = true; document.body.style.overflow = ''; previousFocus?.focus(); };
@@ -179,7 +179,7 @@
       if (overlay.hidden) return;
       if (e.key === 'Escape') closeSearch();
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length; renderSearch(); }
-      if (e.key === 'Enter' && matches[selected]) window.location.href = `/ege/informatika/${matches[selected].id}/`;
+      if (e.key === 'Enter' && matches[selected]) window.location.href = `/task/?id=${matches[selected].id}`;
     });
   }
 
