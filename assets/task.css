@@ -1,35 +1,22 @@
-/* ===== Каталог ===== */
 .catalog-hero{padding:36px 0 22px;display:flex;flex-direction:column;gap:20px}
 .catalog-hero h1{font-size:clamp(28px,5.5vw,40px);margin:8px 0 8px}
-.catalog-hero p{margin:0;font-size:14px;max-width:560px}
-.progress-summary{background:var(--surface);border:1px solid var(--line);padding:14px 18px;border-radius:12px;min-width:200px;align-self:flex-start}
-.progress-summary strong{font-size:22px;font-weight:800}
-.progress-summary p{font-size:11px;margin:2px 0 8px}
-.progress-line{height:5px;background:var(--surface-2);border-radius:6px;overflow:hidden}
-.progress-line span{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
-@media(min-width:760px){.catalog-hero{flex-direction:row;justify-content:space-between;align-items:flex-end}.progress-summary{align-self:auto}}
+@media(min-width:760px){.catalog-hero{flex-direction:row;justify-content:space-between;align-items:flex-end}}
 .catalog-tools{display:flex;flex-direction:column;gap:12px;padding:16px 0 18px;border-top:1px solid var(--line)}
 .catalog-search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-width:360px}
 .catalog-search svg{width:16px;color:var(--muted)}
 .catalog-search input{border:0;outline:0;background:transparent;color:var(--ink);width:100%;font-size:13px}
 @media(min-width:760px){.catalog-tools{flex-direction:row;align-items:center}}
 .catalog-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;padding-bottom:48px}
-.catalog-note{margin:0 0 16px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
-.catalog-note svg{width:15px;color:var(--teal)}
 
-/* ===== Страница разбора ===== */
 .reading-progress{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:120;width:0}
 .lesson-breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding-top:22px;margin-bottom:20px;flex-wrap:wrap}
 .lesson-breadcrumb a:hover{color:var(--accent)}
 .lesson-header{border-bottom:1px solid var(--line);padding-bottom:22px;display:flex;flex-direction:column;gap:16px}
-.lesson-label{font:600 11px var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .lesson-header h1{font-size:clamp(24px,5vw,34px);max-width:760px;margin:0 0 8px}
-.lesson-description{font-size:14px;max-width:680px;margin:0}
-.lesson-meta{display:flex;gap:14px;margin-top:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.lesson-description{font-size:15px;line-height:1.75;max-width:680px;margin:0}
+.lesson-meta{display:flex;gap:16px;margin-top:12px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
 .lesson-meta span{display:flex;align-items:center;gap:5px}
 .lesson-meta svg{width:14px;height:14px}
-.lesson-header-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
-.lesson-header-actions .button{font-size:13px;min-height:38px;padding:9px 14px}
 @media(min-width:860px){.lesson-header{flex-direction:row;justify-content:space-between;align-items:flex-end}}
 
 .lesson-layout{display:grid;grid-template-columns:1fr;gap:0;padding-top:26px}
@@ -45,13 +32,6 @@
 .toc a{font-size:12.5px;color:var(--muted);padding:7px 0 7px 15px;margin-left:-1px;border-left:2px solid transparent;transition:color .15s}
 .toc a:hover{color:var(--ink)}
 .toc a.active{color:var(--accent);border-color:var(--accent);font-weight:700}
-.toc-progress{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
-.toc-progress-label{font-size:11px;color:var(--muted);margin-bottom:7px}
-.toc-progress .progress-line{margin-bottom:6px}
-.toc-progress small{font-size:11px;color:var(--muted)}
-.aside-complete{width:100%;margin-top:16px;font-size:12px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px;display:flex;align-items:center;justify-content:center;gap:7px;font-weight:600}
-.aside-complete svg{width:14px;height:14px}
-.aside-complete.completed{border-color:var(--green);color:var(--green);background:var(--green-soft)}
 
 .lesson-section{margin-bottom:36px;scroll-margin-top:80px}
 .lesson-section h2{font-size:clamp(19px,4vw,24px);margin:0 0 14px;display:flex;align-items:baseline;gap:10px}
@@ -62,12 +42,10 @@
 .theory-divider{border:0;border-top:1px solid var(--line);margin:26px 0}
 .formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;margin:16px 0}
 .formula-card{padding:15px 16px;border:1px solid var(--line);background:var(--surface);border-radius:10px}
-.formula-card h4{font-size:13px;margin:0 0 5px;letter-spacing:-.01em}
-.formula-card p{font-size:12.5px;margin:0;line-height:1.75}
+.formula-card h4{font-size:14px;margin:0 0 8px;letter-spacing:-.01em;color:var(--ink)}
+.formula-card p{font-size:13.5px;margin:0;line-height:1.8}
+.formula-card code{font-size:13px;padding:2px 7px}
 code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--teal-soft);border-radius:4px;padding:1px 5px}
-.callout{display:flex;align-items:flex-start;gap:10px;padding:13px 15px;border-radius:10px;font-size:12.5px;background:var(--teal-soft);color:var(--teal);margin-top:16px;line-height:1.7}
-[data-theme=dark] .callout{color:#a9d4cc}
-.callout svg{width:17px;height:17px;margin-top:2px}
 .sec-label{font:600 10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
 .worked-example{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0}
 .example-problem{padding:18px 20px;border-bottom:1px solid var(--line)}
@@ -80,7 +58,6 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .algorithm-list li{counter-increment:algorithm;display:flex;gap:14px;margin:13px 0;font-size:13.5px;line-height:1.8;color:var(--muted)}
 .algorithm-list li:before{content:counter(algorithm);width:24px;height:24px;flex-shrink:0;background:var(--surface);border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono);color:var(--teal);margin-top:1px}
 
-/* Видео */
 .video-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
 .video-placeholder{padding:22px 20px;display:flex;align-items:center;gap:16px;background:var(--surface-2)}
 .video-play-button{width:46px;height:46px;flex-shrink:0;display:grid;place-items:center;background:var(--red);color:#fff;border:0;border-radius:50%}
@@ -91,7 +68,6 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .video-embed{position:relative;aspect-ratio:16/9;background:#111}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
-/* Ошибки и вкладки */
 .errors-box{border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--surface);border-radius:0 10px 10px 0;padding:8px 18px}
 .error-item{border-bottom:1px solid var(--line)}
 .error-item:last-child{border:0}
@@ -104,7 +80,6 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .material-tab{border:0;background:transparent;padding:10px 14px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .material-tab.active{color:var(--accent);border-color:var(--accent);font-weight:700}
 
-/* Код */
 .code-panel{background:var(--code);border:1px solid #314047;border-radius:12px;overflow:hidden;color:var(--code-ink)}
 .code-toolbar{display:flex;align-items:center;gap:14px;border-bottom:1px solid #303e45;padding:9px 14px;font:10.5px var(--mono);color:var(--code-muted)}
 .code-toolbar .file-tab{color:#bacacd;padding:4px 0;border-bottom:1px solid #94b5a7}
@@ -117,18 +92,20 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .code-note{padding:10px 14px;border-top:1px solid #303e45;display:flex;align-items:center;gap:9px;font-size:11px;color:var(--code-muted)}
 .code-note svg{width:15px;height:15px;color:#8cbba1}
 
-/* Тренировка */
 .practice-header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:16px}
 .practice-header h2{margin:0}
-.practice-counter{font:600 11px var(--mono);color:var(--muted);white-space:nowrap}
 .practice-area{display:flex;flex-direction:column;gap:12px}
 .practice-card{border:1px solid var(--line);background:var(--surface);border-radius:12px;overflow:hidden;transition:border-color .2s}
 .practice-card.correct{border-color:var(--green)}
 .practice-card.incorrect{border-color:var(--red)}
-.practice-card-header{padding:16px 18px 0;display:flex;gap:12px}
-.practice-label{font:600 10px var(--mono);color:var(--teal);margin-top:4px;white-space:nowrap}
-.practice-card h3{font-size:13.5px;line-height:1.75;font-weight:500;letter-spacing:0;margin:0}
-.practice-controls{display:flex;gap:8px;padding:14px 18px 16px;flex-wrap:wrap}
+.practice-card-header{padding:18px 18px 0;display:flex;flex-direction:column;gap:6px}
+.practice-label{font:600 10px var(--mono);color:var(--teal);margin:0;white-space:nowrap}
+.practice-card h3{font-size:15px;line-height:1.7;font-weight:600;letter-spacing:0;margin:0}
+.practice-controls{display:grid;grid-template-columns:1fr;gap:8px;padding:14px 18px 16px}
+.practice-btns{display:flex;gap:8px}
+.practice-btns .button{flex:1}
+.practice-btns .hint-button{flex:1;display:flex;align-items:center;justify-content:center;min-height:38px}
+@media(min-width:640px){.practice-controls{grid-template-columns:1fr auto}.practice-btns .button,.practice-btns .hint-button{flex:0 0 auto}}
 .answer-input{flex:1 1 140px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:13px var(--mono);padding:10px 12px;min-width:0;outline:0}
 .answer-input:focus{border-color:var(--teal)}
 .practice-controls .button{font-size:12.5px;min-height:38px;padding:8px 14px}
@@ -147,7 +124,6 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .lesson-nav .next{text-align:right;margin-left:auto}
 .lesson-nav a:hover{color:var(--accent)}
 
-/* О проекте */
 .about-wrap{max-width:780px;padding:44px 0 64px}
 .about-wrap .about-lead{font-size:16px;line-height:1.75;max-width:640px}
 .about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:26px 0}
@@ -159,13 +135,11 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .about-wrap>section p,.about-wrap li{font-size:13.5px;color:var(--muted);line-height:1.85}
 .about-wrap a{color:var(--teal);text-decoration:underline}
 
-/* Тост */
 .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);font-size:13px;padding:12px 18px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;z-index:150;box-shadow:var(--shadow);max-width:90%;text-align:center}
 .toast.visible{opacity:1;transform:translate(-50%,0)}
 
-/* Выпадающие списки выбора экзамена/предмета */
 .catalog-title{line-height:1.25}
-.catalog-select{display:inline-flex;align-items:center;gap:.12em;background:transparent;border:0;color:var(--ink);font:inherit;font-weight:800;letter-spacing:-.045em;padding:0 .08em;border-radius:.2em;vertical-align:baseline;cursor:pointer;transition:background .15s}
+.catalog-select{display:inline-flex;align-items:center;gap:.12em;background:transparent;border:0;color:var(--ink);font:inherit;font-weight:800;letter-spacing:-.045em;padding:0 .08em;margin:0 -.08em;border-radius:.2em;vertical-align:baseline;cursor:pointer;transition:background .15s}
 .catalog-select:hover{background:var(--surface-2)}
 .catalog-select.accent{color:var(--accent)}
 .catalog-select svg{width:.5em;height:.5em;stroke-width:2.5;opacity:.55;transition:transform .15s}
@@ -181,22 +155,4 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .select-pop-item.active-item{background:var(--accent-soft);color:var(--accent)}
 .select-pop-item.disabled{color:var(--muted);cursor:default;font-weight:500}
 .select-pop-item .soon{margin-left:auto;font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px}
-.select-pop-item .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--green)}
 .select-pop-empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
-
-/* Читаемость разбора (mobile-first как приложение) */
-.practice-controls{display:grid;grid-template-columns:1fr;gap:8px}
-.practice-btns{display:flex;gap:8px}
-.practice-btns .button{flex:1}
-.practice-btns .hint-button{flex:1;display:flex;align-items:center;justify-content:center;min-height:38px}
-@media(min-width:640px){.practice-controls{grid-template-columns:1fr auto}.practice-btns .button,.practice-btns .hint-button{flex:0 0 auto}}
-.formula-card h4{font-size:14px;margin:0 0 8px;color:var(--ink)}
-.formula-card p{font-size:13.5px;line-height:1.8}
-.formula-card code{font-size:13px;padding:2px 7px}
-.practice-card h3{font-size:15px;line-height:1.7;font-weight:600}
-.practice-card-header{padding:18px 18px 0;flex-direction:column;gap:6px}
-.practice-label{margin:0}
-.lesson-description{font-size:15px;line-height:1.75}
-.lesson-meta{font-size:12.5px;gap:16px}
-/* Кнопки дропдауна на странице каталога — не прыгают по высоте */
-.catalog-select{margin:0 -.08em}
