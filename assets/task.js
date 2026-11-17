@@ -78,7 +78,7 @@
           <section class="lesson-section" id="code"><h2><span class="section-index">${task.video ? '04' : '03'}</span>Проверяем кодом</h2>
             <div class="material-tabs" role="tablist"><button class="material-tab active" data-tab="code" role="tab">Python-код</button><button class="material-tab" data-tab="mistakes" role="tab">Типичные ошибки</button></div>
             <div id="panel-code" role="tabpanel"><div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" id="copy-code">${icon('copy')} Копировать</button></div><pre><code id="code-block">${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div></div>
-            <div id="panel-mistakes" role="tabpanel" hidden><div class="errors-box">${task.errors.map((e, i) => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${escapeHtml(e)}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div></div>
+            <div id="panel-mistakes" role="tabpanel" hidden><div class="errors-box">${task.errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${escapeHtml(e)}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div></div>
           </section>
           <section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${task.video ? '05' : '04'}</span>Тренировка</h2></div>
             <div class="practice-area">${task.practices.map((p, i) => {
@@ -90,27 +90,25 @@
               </article>`;
             }).join('')}</div>
           </section>
-          <nav class="lesson-nav">${prev ? `<a href="task.html?id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="task.html?id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
+          <nav class="lesson-nav">${prev ? `<a href="/ege/informatika/${prev.id}/"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="/ege/informatika/${next.id}/"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
           <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${task.video ? '<a href="#video">Видеоразбор</a>' : ''}<a href="#code">Код и ошибки</a><a href="#practice">Тренировка</a>
         </nav></div></aside>
       </div>`;
 
-    // Видео: загрузка по клику
     root.querySelector('.video-play-button')?.addEventListener('click', () => {
       if (!embed) return;
       const card = root.querySelector('.video-card');
       card.innerHTML = `<div class="video-embed"><iframe src="${embed}" title="${escapeHtml(task.videoTitle)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
     });
 
-    // Вкладки код / ошибки
     root.querySelectorAll('.material-tab').forEach(tab => tab.addEventListener('click', () => {
       root.querySelectorAll('.material-tab').forEach(t => t.classList.toggle('active', t === tab));
       $('#panel-code').hidden = tab.dataset.tab !== 'code';
       $('#panel-mistakes').hidden = tab.dataset.tab !== 'mistakes';
     }));
-    root.querySelectorAll('.error-item button').forEach((btn, i) => btn.addEventListener('click', () => {
+    root.querySelectorAll('.error-item button').forEach(btn => btn.addEventListener('click', () => {
       const item = btn.closest('.error-item'); const open = item.classList.toggle('expanded');
       btn.setAttribute('aria-expanded', open); item.querySelector('.error-detail').hidden = !open;
     }));
@@ -119,9 +117,6 @@
       catch { window.showToast('Не получилось скопировать — выдели код вручную'); }
     });
 
-
-    // Практика
-    const updateCounter = () => {};
     const check = (card, index) => {
       const p = task.practices[index];
       const inputEl = card.querySelector('.answer-input');
@@ -134,7 +129,6 @@
       const cur = storage.get(`answers-${task.id}`, {});
       cur[index] = { value, correct }; storage.set(`answers-${task.id}`, cur);
       if (correct) { inputEl.setAttribute('aria-invalid', 'false'); window.showToast('Верно! Так держать'); }
-      updateCounter();
     };
     root.querySelectorAll('[data-check]').forEach(btn => btn.addEventListener('click', () => check(btn.closest('.practice-card'), Number(btn.dataset.check))));
     root.querySelectorAll('.answer-input').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(inp.closest('.practice-card'), Number(inp.closest('.practice-card').dataset.index)); }));
@@ -143,9 +137,7 @@
       if (card.querySelector('.practice-hint')) { card.querySelector('.practice-hint').remove(); return; }
       card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${task.practices[Number(btn.dataset.hint)].hint}</div>`);
     }));
-    updateCounter();
 
-    // Подсветка активного пункта содержания + полоса чтения
     const links = root.querySelectorAll('.toc a');
     const sections = [...links].map(a => root.querySelector(a.getAttribute('href'))).filter(Boolean);
     const spy = new IntersectionObserver(entries => {
