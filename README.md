@@ -32,7 +32,7 @@
 ## Как помочь
 
 - Расскажи о проекте тем, кто готовится к экзаменам.
-- Пришли свой разбор задания или сообщи об ошибке — через [Issues](https://github.com/myeazy/myeazy.github.io/issues) или [Telegram](https://t.me/eazy_ege).
+- Пришли свой разбор задания или сообщи об ошибке — через [Issues](https://github.com/myeazy/myeazy.github.io/issues) или [Telegram](https://t.me/eazy_official).
 - Подробнее — на странице [поддержки проекта](https://myeazy.github.io/support/).
 
 ### Свой разбор — это просто
