@@ -10,26 +10,21 @@
   };
   window.Yasno = { $, $$, icon, escapeHtml, storage };
 
-  // ===== Тема с анимацией от точки нажатия =====
   function applyTheme(dark) {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    $$('.theme-toggle').forEach(b => b.innerHTML = icon(dark ? 'sun' : 'moon'));
-    $$('.menu-theme-state').forEach(el => el.textContent = dark ? 'Светлая' : 'Тёмная');
+    $$('#menu-theme use').forEach(u => u.setAttribute('href', dark ? '#i-sun' : '#i-moon'));
     $('meta[name="theme-color"]')?.setAttribute('content', dark ? '#131517' : '#f4f2ec');
   }
   applyTheme(document.documentElement.dataset.theme === 'dark');
+
   function toggleTheme(x, y) {
     const dark = document.documentElement.dataset.theme !== 'dark';
     try { localStorage.setItem('yasno-theme', dark ? 'dark' : 'light'); } catch (_) {}
-    const updateIcons = () => {
-      $$('#menu-theme use').forEach(u => u.setAttribute('href', dark ? '#i-sun' : '#i-moon'));
-      $$('.theme-toggle').forEach(b => b.innerHTML = icon(dark ? 'sun' : 'moon'));
-    };
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isYandex = /YaBrowser/i.test(navigator.userAgent);
-    if (reduced) { applyTheme(dark); updateIcons(); return; }
+    if (reduced) { applyTheme(dark); return; }
     if (!isYandex && document.startViewTransition) {
-      const vt = document.startViewTransition(() => { applyTheme(dark); updateIcons(); });
+      const vt = document.startViewTransition(() => applyTheme(dark));
       vt.ready.then(() => {
         const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
         const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
@@ -40,7 +35,6 @@
       }).catch(() => {});
       return;
     }
-    // Надёжный путь (Яндекс и пр.): круг из точки нажатия + затухание
     const cx = x ?? innerWidth / 2, cy = y ?? innerHeight / 2;
     const r = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
     const clip = document.createElement('div');
@@ -52,7 +46,7 @@
       { duration: 450, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }
     );
     anim.onfinish = () => {
-      applyTheme(dark); updateIcons();
+      applyTheme(dark);
       clip.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }).onfinish = () => clip.remove();
     };
   }
@@ -76,23 +70,6 @@
       <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
     </${card}>`;
   }
-  window.taskCard = taskCard;
-
-  const homeGrid = $('#home-task-grid');
-  if (homeGrid) {
-    const ids = [8, 13, 25, 2, 15, 17];
-    const renderHome = filter => {
-      const list = ids.map(window.getTask).filter(task => filter === 'all' || (filter === 'high' ? task.difficulty === 'high' : task.category === filter));
-      homeGrid.innerHTML = list.map(task => taskCard(task)).join('');
-      $('#home-empty').hidden = list.length > 0;
-    };
-    renderHome('all');
-    $$('#home-filters .filter-chip').forEach(button => button.addEventListener('click', () => {
-      $$('#home-filters .filter-chip').forEach(item => item.classList.remove('active'));
-      button.classList.add('active'); renderHome(button.dataset.filter);
-    }));
-    $('#reset-home-filter')?.addEventListener('click', () => $('[data-filter="all"]', $('#home-filters')).click());
-  }
 
   const catalogGrid = $('#catalog-grid');
   if (catalogGrid) {
@@ -110,7 +87,6 @@
     renderCatalog();
   }
 
-  // ===== Меню-шторка слева: фикс. шапка/низ, свайпы, 2 аккордеона =====
   const menuBtn = $('.menu-btn');
   if (menuBtn) {
     const ov = document.createElement('div');
@@ -147,7 +123,6 @@
         </div>
       </div>`;
     document.body.appendChild(ov);
-    const panel = ov.querySelector('.menu-panel');
 
     const openMenu = () => { ov.hidden = false; menuBtn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden'; requestAnimationFrame(() => ov.classList.add('open')); };
     const closeMenu = () => { ov.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; setTimeout(() => { ov.hidden = true; }, 240); };
@@ -156,7 +131,6 @@
     ov.addEventListener('click', e => { if (e.target === ov) closeMenu(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) closeMenu(); });
 
-    // Аккордеон: один открытый на уровне, корневой ЕГЭ не закрывается
     ov.querySelectorAll('.acc-head:not(.disabled)').forEach(head => {
       head.addEventListener('click', () => {
         const acc = head.parentElement;
@@ -181,10 +155,9 @@
       const b = e.currentTarget.getBoundingClientRect();
       toggleTheme(b.left + b.width / 2, b.top + b.height / 2);
     });
-
+    applyTheme(document.documentElement.dataset.theme === 'dark');
   }
 
-  // Поиск (Ctrl+K)
   const overlay = $('#search-overlay');
   if (overlay) {
     const input = $('#global-search');
@@ -198,7 +171,6 @@
     };
     const openSearch = () => { previousFocus = document.activeElement; overlay.hidden = false; document.body.style.overflow = 'hidden'; input.value = ''; selected = 0; renderSearch(); input.focus(); };
     const closeSearch = () => { overlay.hidden = true; document.body.style.overflow = ''; previousFocus?.focus(); };
-    $$('.search-open').forEach(b => b.addEventListener('click', openSearch));
     $('.modal-close')?.addEventListener('click', closeSearch);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
     input?.addEventListener('input', () => { selected = 0; renderSearch(); });
