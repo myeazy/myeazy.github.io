@@ -125,7 +125,7 @@
           <div class="menu-brand"><a class="menu-logo" href="/app/">EAZY<span class="brand-dot">.</span></a><span class="menu-tagline">Every Answer Zips to You</span></div>
           <button class="icon-button menu-close" aria-label="Закрыть меню"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
-        <div class="menu-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="menu-search-input" type="search" placeholder="Найти задание…" autocomplete="off" aria-label="Поиск по заданиям"></div>
+        <div class="menu-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="menu-search-input" type="search" placeholder="Предмет или экзамен…" autocomplete="off" aria-label="Поиск по предметам"></div>
         <div class="menu-scroll">
           <div class="menu-results" id="menu-results" hidden></div>
           <div class="menu-nav" id="menu-nav">${menuExams}</div>
@@ -175,8 +175,18 @@
     const menuNav = ov.querySelector('#menu-nav');
     menuSearch.addEventListener('input', () => {
       if (!menuSearch.value.trim()) { menuResults.hidden = true; menuNav.hidden = false; return; }
-      const found = taskMatches(menuSearch.value).slice(0, 12);
-      menuResults.innerHTML = found.length ? found.map(resultRow).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+      const q = menuSearch.value.trim().toLowerCase();
+      const rows = [];
+      window.CATALOG.forEach(exam => {
+        if (exam.label.toLowerCase().includes(q)) rows.push({ title: exam.label, sub: exam.active ? 'Каталог заданий' : 'раздел скоро появится', href: exam.active ? '/app/' : null });
+        exam.subjects.forEach(s => {
+          if (s.name.toLowerCase().includes(q) || s.caseForm.includes(q)) rows.push({ title: s.name, sub: exam.label + (s.active ? ' · каталог' : ' · скоро'), href: s.active ? '/app/' : null });
+        });
+      });
+      menuResults.innerHTML = rows.length ? rows.map(r => r.href
+        ? `<a class="search-result" href="${r.href}"><span class="search-result-title">${r.title}<small>${r.sub}</small></span><span class="status-label">Открыть →</span></a>`
+        : `<div class="search-result"><span class="search-result-title">${r.title}<small>${r.sub}</small></span><span class="status-label">скоро</span></div>`).join('')
+        : '<div class="search-placeholder">Ничего не найдено. Попробуй «информатика».</div>';
       menuResults.hidden = false;
       menuNav.hidden = true;
       menuResults.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
