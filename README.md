@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/brand-wide-dark.gif">
+    <img src="assets/brand/brand-wide-light.gif" alt="EAZY — Every Answer Zips to You" width="100%">
+  </picture>
+</p>
+
 # EAZY — ЕГЭ и ОГЭ без лишнего
 
 Понятные разборы заданий ЕГЭ: короткая теория без воды, разбор примера, код для самопроверки и тренировка с мгновенной проверкой ответа — всё на одной странице.
@@ -27,5 +34,9 @@
 - Расскажи о проекте тем, кто готовится к экзаменам.
 - Пришли свой разбор задания или сообщи об ошибке — через [Issues](https://github.com/myeazy/myeazy.github.io/issues) или [Telegram](https://t.me/eazy_ege).
 - Подробнее — на странице [поддержки проекта](https://myeazy.github.io/support/).
+
+### Свой разбор — это просто
+
+Разбор живёт в одном файле: `assets/tasks/NN.js` — теория, пример, код и задачи для тренировки. В `assets/tasks.js` у нужного номера ставишь `ready: true` — и страница `myeazy.github.io/task/?id=NN` сама подхватывает разбор. Проверка перед пушем: `node --check assets/tasks/NN.js`.
 
 Формулировки заданий ориентированы на открытый банк заданий [ФИПИ](https://fipi.ru) и демоверсии КИМ.
