@@ -1,9 +1,7 @@
 (() => {
   'use strict';
   const { $, icon, escapeHtml, storage } = window.Yasno;
-  let id = Number(new URLSearchParams(location.search).get('id'));
-  const m = location.pathname.match(/\/ege\/([a-z-]+)\/(\d+)/);
-  if (m) id = Number(m[2]);
+  const id = Number(new URLSearchParams(location.search).get('id'));
   const taskMeta = window.TASKS.find(t => t.id === id);
   const content = (window.EAZY_CONTENT || {})[id] || null;
   const task = taskMeta ? { ...taskMeta, ...(content || {}) } : null;
@@ -46,7 +44,7 @@
     }
     document.title = `Задание ${task.id}: ${task.title} — EAZY`;
     if (!task.ready) {
-      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Задание ${task.id}. ${escapeHtml(task.title)}</h2><p>${escapeHtml(task.short)}.<br>Полный разбор уже в работе — загляни позже, а пока посмотри готовые номера.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="/ege/informatika/8/">Открыть задание 8</a><a class="button button-secondary" href="/app/">Все задания</a></div></div>`;
+      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Задание ${task.id}. ${escapeHtml(task.title)}</h2><p>${escapeHtml(task.short)}.<br>Полный разбор уже в работе — загляни позже, а пока посмотри готовые номера.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="/task/?id=8">Открыть задание 8</a><a class="button button-secondary" href="/app/">Все задания</a></div></div>`;
       return;
     }
     const next = window.TASKS.find(t => t.ready && t.id > task.id) || window.TASKS.find(t => t.ready);
@@ -90,7 +88,7 @@
               </article>`;
             }).join('')}</div>
           </section>
-          <nav class="lesson-nav">${prev ? `<a href="/ege/informatika/${prev.id}/"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="/ege/informatika/${next.id}/"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
+          <nav class="lesson-nav">${prev ? `<a href="/task/?id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="/task/?id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
           <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${task.video ? '<a href="#video">Видеоразбор</a>' : ''}<a href="#code">Код и ошибки</a><a href="#practice">Тренировка</a>
