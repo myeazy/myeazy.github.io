@@ -1,28 +1,9 @@
 (() => {
   'use strict';
-  const { $, $$ } = window.Yasno;
+  const activeExam = window.CATALOG.find(e => e.active) || window.CATALOG[0];
   const DATA = {
-    exam: {
-      items: [
-        { label: 'ЕГЭ', active: true },
-        { label: 'ОГЭ', active: false },
-      ],
-    },
-    subject: {
-      items: [
-        { label: 'информатике', active: true },
-        { label: 'математике', active: false },
-        { label: 'русскому языку', active: false },
-        { label: 'физике', active: false },
-        { label: 'химии', active: false },
-        { label: 'биологии', active: false },
-        { label: 'обществознанию', active: false },
-        { label: 'истории', active: false },
-        { label: 'английскому языку', active: false },
-        { label: 'литературе', active: false },
-        { label: 'географии', active: false },
-      ],
-    },
+    exam: { items: window.CATALOG.map(e => ({ label: e.label, active: e.active })) },
+    subject: { items: activeExam.subjects.map(s => ({ label: s.caseForm, active: s.active })) },
   };
 
   let openPop = null;

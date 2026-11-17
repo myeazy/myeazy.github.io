@@ -376,3 +376,25 @@ window.TASKS = [
   }
 ];
 window.getTask = id => window.TASKS.find(t => t.id === Number(id));
+
+window.CATALOG = [
+  {
+    id: "ege",
+    label: "ЕГЭ",
+    active: true,
+    subjects: [
+      { id: "informatika", name: "Информатика", caseForm: "информатике", active: true, inMenu: true },
+      { id: "matematika", name: "Математика", caseForm: "математике", active: false, inMenu: true },
+      { id: "russky", name: "Русский язык", caseForm: "русскому языку", active: false, inMenu: true },
+      { id: "fizika", name: "Физика", caseForm: "физике", active: false, inMenu: true },
+      { id: "himiya", name: "Химия", caseForm: "химии", active: false },
+      { id: "biologia", name: "Биология", caseForm: "биологии", active: false },
+      { id: "obschestvo", name: "Обществознание", caseForm: "обществознанию", active: false },
+      { id: "istoria", name: "История", caseForm: "истории", active: false },
+      { id: "angliysky", name: "Английский язык", caseForm: "английскому языку", active: false },
+      { id: "literatura", name: "Литература", caseForm: "литературе", active: false },
+      { id: "geografia", name: "География", caseForm: "географии", active: false }
+    ]
+  },
+  { id: "oge", label: "ОГЭ", active: false, subjects: [] }
+];
