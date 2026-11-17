@@ -3,11 +3,8 @@
   const { $, icon, escapeHtml, storage } = window.Yasno;
   const id = Number(new URLSearchParams(location.search).get('id'));
   const taskMeta = window.TASKS.find(t => t.id === id);
-  const content = (window.EAZY_CONTENT || {})[id] || null;
-  const task = taskMeta ? { ...taskMeta, ...(content || {}) } : null;
-  if (task) task.ready = taskMeta.ready && !!content;
   const root = $('#lesson-content');
-  $('#breadcrumb-task').textContent = task ? `${task.id}` : 'Не найдено';
+  let task = null;
 
   function normalize(value) {
     return String(value).trim().toLowerCase().replace(/\s+/g, ' ').replace(/,(\d)/g, '.$1').replace(/[ё]/g, 'е');
@@ -37,6 +34,10 @@
   }
 
   function render() {
+    const content = (window.EAZY_CONTENT || {})[id] || null;
+    task = taskMeta ? { ...taskMeta, ...(content || {}) } : null;
+    if (task) task.ready = taskMeta.ready && !!content;
+    $('#breadcrumb-task').textContent = task ? `${task.id}` : 'Не найдено';
     if (!task) {
       root.innerHTML = `<div class="empty-state"><h3>Такого задания нет</h3><p>Проверь ссылку или выбери номер из каталога.</p><a class="button button-primary" href="/app/">К каталогу</a></div>`;
       document.title = 'Задание не найдено — EAZY';
@@ -149,5 +150,12 @@
     const h = document.documentElement;
     bar.style.width = `${(h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100}%`;
   }, { passive: true });
-  document.addEventListener('DOMContentLoaded', render);
+  const loadContent = done => {
+    if (!taskMeta || !taskMeta.ready) { done(); return; }
+    const s = document.createElement('script');
+    s.src = `/assets/tasks/${String(id).padStart(2, '0')}.js`;
+    s.onload = s.onerror = () => done();
+    document.head.appendChild(s);
+  };
+  document.addEventListener('DOMContentLoaded', () => loadContent(render));
 })();
