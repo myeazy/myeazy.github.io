@@ -12,7 +12,7 @@
   "icons": [
     {
       "src": "assets/icons/eazy-icon-dark.png",
-      "sizes": "192x192 512x512 1254x1254",
+      "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any"
     },
