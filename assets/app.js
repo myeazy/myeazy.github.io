@@ -95,6 +95,7 @@
     const syncSubjectLabel = () => {
       const meta = subjectMeta(currentSubject);
       if (meta) $$('[data-select="subject"] > span').forEach(el => el.textContent = meta.caseForm);
+      $$('[data-select="exam"] > span').forEach(el => el.textContent = activeExam().label);
     };
     syncSubjectLabel();
     window.addEventListener('eazy:subject', e => {

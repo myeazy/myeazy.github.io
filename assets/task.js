@@ -3,7 +3,8 @@
   const { $, icon, escapeHtml, storage } = window.Yasno;
   const params = new URLSearchParams(location.search);
   const id = Number(params.get('id'));
-  const subjectId = params.get('subject') || 'informatika';
+  const fallbackSubject = (window.CATALOG.find(e => e.active) || window.CATALOG[0]).subjects.find(s => s.active)?.id || 'informatika';
+  const subjectId = params.get('subject') || fallbackSubject;
   const taskMeta = window.getTask(id, subjectId);
   const subjectName = (window.CATALOG.flatMap(e => e.subjects).find(s => s.id === subjectId) || {}).name || subjectId;
   const root = $('#lesson-content');
@@ -50,7 +51,10 @@
     }
     document.title = `Задание ${task.id}: ${task.title} — EAZY`;
     if (!task.ready) {
-      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Задание ${task.id}. ${escapeHtml(task.title)}</h2><p>${escapeHtml(task.short)}.<br>Полный разбор уже в работе — загляни позже, а пока посмотри готовые номера.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="/task/?subject=informatika&id=8">Открыть задание 8</a><a class="button button-secondary" href="/app/">Все задания</a></div></div>`;
+      const firstReady = window.getTasks(subjectId).find(x => x.ready);
+      const altHref = firstReady ? `/task/?subject=${subjectId}&id=${firstReady.id}` : '/app/';
+      const altLabel = firstReady ? `Открыть задание ${firstReady.id}` : 'В каталог';
+      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Задание ${task.id}. ${escapeHtml(task.title)}</h2><p>${escapeHtml(task.short)}.<br>Полный разбор уже в работе — загляни позже, а пока посмотри готовые номера.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="${altHref}">${altLabel}</a><a class="button button-secondary" href="/app/">Все задания</a></div></div>`;
       return;
     }
     const subjectTasks = window.getTasks(subjectId);
