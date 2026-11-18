@@ -578,17 +578,17 @@ window.CATALOG = [
     label: "ЕГЭ",
     active: true,
     subjects: [
+      { id: "angliysky", name: "Английский язык", caseForm: "английскому языку", active: false },
+      { id: "biologia", name: "Биология", caseForm: "биологии", active: false },
+      { id: "geografia", name: "География", caseForm: "географии", active: false },
       { id: "informatika", name: "Информатика", caseForm: "информатике", active: true, inMenu: true },
+      { id: "istoria", name: "История", caseForm: "истории", active: false },
+      { id: "literatura", name: "Литература", caseForm: "литературе", active: false },
+      { id: "obschestvo", name: "Обществознание", caseForm: "обществознанию", active: false },
       { id: "matematika", name: "Профильная математика", caseForm: "профильной математике", active: true, inMenu: true },
       { id: "russky", name: "Русский язык", caseForm: "русскому языку", active: false, inMenu: true },
       { id: "fizika", name: "Физика", caseForm: "физике", active: false, inMenu: true },
-      { id: "himiya", name: "Химия", caseForm: "химии", active: false },
-      { id: "biologia", name: "Биология", caseForm: "биологии", active: false },
-      { id: "obschestvo", name: "Обществознание", caseForm: "обществознанию", active: false },
-      { id: "istoria", name: "История", caseForm: "истории", active: false },
-      { id: "angliysky", name: "Английский язык", caseForm: "английскому языку", active: false },
-      { id: "literatura", name: "Литература", caseForm: "литературе", active: false },
-      { id: "geografia", name: "География", caseForm: "географии", active: false }
+      { id: "himiya", name: "Химия", caseForm: "химии", active: false }
     ]
   },
   { id: "oge", label: "ОГЭ", active: false, subjects: [] }
