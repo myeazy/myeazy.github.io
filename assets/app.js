@@ -61,9 +61,17 @@
     window.toastTimer = setTimeout(() => toast.classList.remove('visible'), 2800);
   };
 
-  function taskCard(task) {
+  const activeExam = () => window.CATALOG.find(e => e.active) || window.CATALOG[0];
+  const firstSubject = () => activeExam().subjects.find(s => s.active)?.id || 'informatika';
+  const subjectMeta = sid => activeExam().subjects.find(s => s.id === sid) || null;
+  const taskUrl = (sid, id) => `/task/?subject=${sid}&id=${id}`;
+
+  let currentSubject = storage.get('subject', firstSubject());
+  if (!window.getTasks(currentSubject).length) currentSubject = firstSubject();
+
+  function taskCard(task, sid) {
     const card = task.ready ? 'a' : 'article';
-    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="/task/?id=${task.id}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
+    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="${taskUrl(sid, task.id)}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
       <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
       <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
       <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
@@ -75,23 +83,39 @@
   if (catalogGrid) {
     const renderCatalog = () => {
       const query = ($('#catalog-search').value || '').trim().toLowerCase();
-      const list = window.TASKS.filter(task => {
+      const list = window.getTasks(currentSubject).filter(task => {
         const haystack = [task.id, task.title, task.short, ...(task.tags || [])].join(' ').toLowerCase();
         return haystack.includes(query);
       });
-      catalogGrid.innerHTML = list.map(task => taskCard(task)).join('');
+      catalogGrid.innerHTML = list.map(task => taskCard(task, currentSubject)).join('');
       $('#catalog-empty').hidden = list.length > 0;
     };
     $('#catalog-search').addEventListener('input', renderCatalog);
     $('#reset-catalog')?.addEventListener('click', () => { $('#catalog-search').value = ''; renderCatalog(); });
+    const syncSubjectLabel = () => {
+      const meta = subjectMeta(currentSubject);
+      if (meta) $$('[data-select="subject"] > span').forEach(el => el.textContent = meta.caseForm);
+    };
+    syncSubjectLabel();
+    window.addEventListener('eazy:subject', e => {
+      const sid = e.detail;
+      if (!window.getTasks(sid).length) return;
+      currentSubject = sid;
+      storage.set('subject', sid);
+      syncSubjectLabel();
+      renderCatalog();
+    });
     renderCatalog();
   }
 
+  const allSearchable = () => window.CATALOG.filter(e => e.active).flatMap(e =>
+    e.subjects.filter(s => s.active).flatMap(s =>
+      window.getTasks(s.id).map(t => ({ ...t, _sid: s.id, _sname: s.name }))));
   const taskMatches = query => {
     const q = query.trim().toLowerCase();
-    return window.TASKS.filter(t => [t.id, t.title, t.short, ...(t.tags || [])].join(' ').toLowerCase().includes(q));
+    return allSearchable().filter(t => [t.id, t.title, t.short, t._sname, ...(t.tags || [])].join(' ').toLowerCase().includes(q));
   };
-  const resultRow = task => `<a class="search-result" href="/task/?id=${task.id}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`;
+  const resultRow = task => `<a class="search-result" href="${taskUrl(task._sid, task.id)}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)} · ${escapeHtml(task._sname)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`;
 
   const menuBtn = $('.menu-btn');
   if (menuBtn) {
@@ -106,7 +130,7 @@
         if (!s.active) return `<button class="acc-head sub disabled" type="button"><span class="acc-title">${s.name}</span><span class="menu-soon">скоро</span></button>`;
         return `<div class="acc" data-acc="${s.id}">
           <button class="acc-head sub" aria-expanded="false"><span class="acc-title">${s.name}</span>${CHEV}</button>
-          <div class="acc-body"><div class="menu-tasks">${window.TASKS.map(t => `<a href="/task/?id=${t.id}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
+          <div class="acc-body"><div class="menu-tasks">${window.getTasks(s.id).map(t => `<a href="${taskUrl(s.id, t.id)}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
         </div>`;
       }).join('');
       return `<div class="acc open" data-acc="${exam.id}">
@@ -227,7 +251,7 @@
       if (overlay.hidden) return;
       if (e.key === 'Escape') closeSearch();
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length; renderSearch(); }
-      if (e.key === 'Enter' && matches[selected]) window.location.href = `/task/?id=${matches[selected].id}`;
+      if (e.key === 'Enter' && matches[selected]) window.location.href = taskUrl(matches[selected]._sid, matches[selected].id);
     });
   }
 
