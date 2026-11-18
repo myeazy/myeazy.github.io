@@ -15,7 +15,7 @@
   --green:#78c9a3;--green-soft:#1c2e25;--red:#e88f80;--dark:#0f1113;--dark-2:#1a1d20;--dark-line:#2b2f33;--dark-muted:#8d938f;
   --nav:rgba(19,21,23,.88);--code:#0f1113;--shadow:0 14px 44px #0006;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;scroll-padding-top:90px;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden;touch-action:pan-y}
 button,input{font:inherit;color:inherit}button{cursor:pointer}
