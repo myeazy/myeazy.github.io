@@ -375,7 +375,199 @@ window.TASKS = {
     ],
     difficulty: "high"
   }
-]
+],
+  matematika: [
+  {
+    id: 1,
+    title: "Планиметрия: длины, площади, углы",
+    short: "Плоские фигуры",
+    category: "theory",
+    level: "Базовый",
+    time: 3,
+    ready: false,
+    tags: ["планиметрия", "треугольники", "окружности"]
+  },
+  {
+    id: 2,
+    title: "Векторы и операции над ними",
+    short: "Длина, скалярное произведение, координаты",
+    category: "theory",
+    level: "Базовый",
+    time: 3,
+    ready: true,
+    tags: ["векторы", "координаты", "скалярное произведение", "клетчатая сетка"]
+  },
+  {
+    id: 3,
+    title: "Стереометрия",
+    short: "Объёмы и площади тел",
+    category: "theory",
+    level: "Базовый",
+    time: 3,
+    ready: false,
+    tags: ["стереометрия", "объем", "площадь"]
+  },
+  {
+    id: 4,
+    title: "Теория вероятностей",
+    short: "Классическая вероятность",
+    category: "theory",
+    level: "Базовый",
+    time: 2,
+    ready: false,
+    tags: ["вероятность", "события"]
+  },
+  {
+    id: 5,
+    title: "Сложная вероятность",
+    short: "Совместные события",
+    category: "theory",
+    level: "Повышенный",
+    time: 7,
+    ready: false,
+    tags: ["вероятность", "события"]
+  },
+  {
+    id: 6,
+    title: "Простейшие уравнения",
+    short: "Линейные, квадратные, иррациональные",
+    category: "theory",
+    level: "Базовый",
+    time: 2,
+    ready: false,
+    tags: ["уравнения", "корни"]
+  },
+  {
+    id: 7,
+    title: "Вычисление выражений",
+    short: "Логарифмы и тригонометрия",
+    category: "theory",
+    level: "Базовый",
+    time: 3,
+    ready: false,
+    tags: ["логарифмы", "тригонометрия"]
+  },
+  {
+    id: 8,
+    title: "Производная",
+    short: "Касательная и монотонность",
+    category: "theory",
+    level: "Повышенный",
+    time: 5,
+    ready: false,
+    tags: ["производная", "касательная"]
+  },
+  {
+    id: 9,
+    title: "Прикладные задачи",
+    short: "Физические процессы по формулам",
+    category: "theory",
+    level: "Повышенный",
+    time: 5,
+    ready: false,
+    tags: ["формулы", "физика"]
+  },
+  {
+    id: 10,
+    title: "Текстовые задачи",
+    short: "Движение, работа, смеси",
+    category: "theory",
+    level: "Повышенный",
+    time: 6,
+    ready: false,
+    tags: ["движение", "работа", "проценты"]
+  },
+  {
+    id: 11,
+    title: "Графики функций",
+    short: "Чтение и анализ графика",
+    category: "theory",
+    level: "Повышенный",
+    time: 8,
+    ready: false,
+    tags: ["графики", "функции"]
+  },
+  {
+    id: 12,
+    title: "Исследование функций",
+    short: "Наибольшее и наименьшее на отрезке",
+    category: "theory",
+    level: "Повышенный",
+    time: 8,
+    ready: false,
+    tags: ["производная", "экстремум"]
+  },
+  {
+    id: 13,
+    title: "Уравнения",
+    short: "Тригонометрия, логарифмы, комбинированные",
+    category: "theory",
+    level: "Повышенный",
+    time: 10,
+    ready: false,
+    tags: ["уравнения", "тригонометрия", "развернутый ответ"]
+  },
+  {
+    id: 14,
+    title: "Стереометрия с развернутым ответом",
+    short: "Углы, расстояния, объёмы",
+    category: "theory",
+    level: "Высокий",
+    time: 20,
+    ready: false,
+    tags: ["стереометрия", "сечения", "развернутый ответ"]
+  },
+  {
+    id: 15,
+    title: "Неравенства",
+    short: "Логарифмические и показательные",
+    category: "theory",
+    level: "Повышенный",
+    time: 15,
+    ready: false,
+    tags: ["неравенства", "логарифмы", "развернутый ответ"]
+  },
+  {
+    id: 16,
+    title: "Финансовая математика",
+    short: "Вклады и кредиты",
+    category: "theory",
+    level: "Высокий",
+    time: 25,
+    ready: false,
+    tags: ["кредиты", "вклады", "проценты"]
+  },
+  {
+    id: 17,
+    title: "Планиметрия с развернутым ответом",
+    short: "Доказательство и вычисление",
+    category: "theory",
+    level: "Высокий",
+    time: 35,
+    ready: false,
+    tags: ["планиметрия", "доказательство"]
+  },
+  {
+    id: 18,
+    title: "Задача с параметром",
+    short: "Исследование решений",
+    category: "theory",
+    level: "Высокий",
+    time: 35,
+    ready: false,
+    tags: ["параметр", "исследование"]
+  },
+  {
+    id: 19,
+    title: "Теория чисел",
+    short: "Делимость, остатки, доказательство",
+    category: "theory",
+    level: "Высокий",
+    time: 40,
+    ready: false,
+    tags: ["числа", "делимость", "доказательство"]
+  }
+  ]
 };
 window.getTasks = sid => window.TASKS[sid] || [];
 window.getTask = (id, sid) => window.getTasks(sid || 'informatika').find(t => t.id === Number(id));
@@ -387,7 +579,7 @@ window.CATALOG = [
     active: true,
     subjects: [
       { id: "informatika", name: "Информатика", caseForm: "информатике", active: true, inMenu: true },
-      { id: "matematika", name: "Математика", caseForm: "математике", active: false, inMenu: true },
+      { id: "matematika", name: "Профильная математика", caseForm: "профильной математике", active: true, inMenu: true },
       { id: "russky", name: "Русский язык", caseForm: "русскому языку", active: false, inMenu: true },
       { id: "fizika", name: "Физика", caseForm: "физике", active: false, inMenu: true },
       { id: "himiya", name: "Химия", caseForm: "химии", active: false },
