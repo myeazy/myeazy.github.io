@@ -28,8 +28,8 @@
     return s.replace(/\b(ip_network|product|max|min|abs|count)\b/g, '<span class="code-function">$1</span>');
   }
   function mathTex(src) {
-    const GREEK = { alpha:'\u03b1', beta:'\u03b2', gamma:'\u03b3', delta:'\u03b4', theta:'\u03b8', lambda:'\u03bb', mu:'\u03bc', pi:'\u03c0', sigma:'\u03c3', phi:'\u03c6', varphi:'\u03c6', omega:'\u03c9' };
-    const OPS = { cdot:'\u00b7', times:'\u00d7', pm:'\u00b1', geq:'\u2265', leq:'\u2264', neq:'\u2260', to:'\u2192', Rightarrow:'\u21d2', infty:'\u221e', deg:'\u00b0', approx:'\u2248', in:'\u2208' };
+    const GREEK = { alpha:'α', beta:'β', gamma:'γ', delta:'δ', theta:'θ', lambda:'λ', mu:'μ', pi:'π', sigma:'σ', phi:'φ', varphi:'φ', omega:'ω' };
+    const OPS = { cdot:'·', times:'×', pm:'±', geq:'≥', leq:'≤', neq:'≠', to:'→', Rightarrow:'⇒', infty:'∞', deg:'°', approx:'≈', in:'∈' };
     const FN = ['log', 'ln', 'sin', 'cos', 'tg', 'ctg', 'lim', 'min', 'max'];
     let s = escapeHtml(src);
     let prev;
@@ -37,8 +37,8 @@
       prev = s;
       s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/, '<span class="m-frac"><span class="m-num">$1</span><span class="m-den">$2</span></span>');
     } while (s !== prev);
-    s = s.replace(/\\sqrt\[([^\]]*)\]\{([^{}]*)\}/g, '<span class="m-sqrt"><span class="m-root">$1</span>\u221a<span class="m-sqrt-body">$2</span></span>');
-    s = s.replace(/\\sqrt\{([^{}]*)\}/g, '<span class="m-sqrt">\u221a<span class="m-sqrt-body">$1</span></span>');
+    s = s.replace(/\\sqrt\[([^\]]*)\]\{([^{}]*)\}/g, '<span class="m-sqrt"><span class="m-root">$1</span>√<span class="m-sqrt-body">$2</span></span>');
+    s = s.replace(/\\sqrt\{([^{}]*)\}/g, '<span class="m-sqrt">√<span class="m-sqrt-body">$1</span></span>');
     s = s.replace(/\\vec\{([^{}]*)\}/g, '<span class="m-vec">$1</span>');
     s = s.replace(/\\([a-zA-Z]+)/g, (m, name) => GREEK[name] || OPS[name] || (FN.includes(name) ? '<span class="m-fn">' + name + '</span>' : name));
     s = s.replace(/\^\{([^{}]*)\}/g, '<sup>$1</sup>').replace(/\^(\S)/g, '<sup>$1</sup>');
@@ -96,53 +96,79 @@
     const errors = task.errors || [];
     const hasErrorsOnly = !hasCode && errors.length > 0;
     const practices = task.practices || [];
-    let secNo = 0;
-    const num = () => String(++secNo).padStart(2, '0');
 
+    const formulasBlock = `<div class="formula-grid">${(task.formulas || []).map(f => `<div class="formula-card"><h4>${escapeHtml(f[0])}</h4><p>${mathInline(f[1])}</p></div>`).join('')}</div>`;
+    const stepsBlock = `<p class="sec-label">Алгоритм решения</p><ol class="algorithm-list">${(task.steps || []).map(s => `<li>${mathInline(s)}</li>`).join('')}</ol>`;
+    const exampleBlock = `<div class="worked-example"><div class="example-problem"><p>${mathInline(task.example.text)}</p></div><div class="example-solution"><p>${mathInline(task.example.solution)}</p><div class="example-answer">${icon('check')} Ответ: <strong>${mathInline(escapeHtml(task.example.answer))}</strong></div></div></div>`;
     const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${mathInline(escapeHtml(e))}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
+    const codePanel = `<div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" data-copy>${icon('copy')} Копировать</button></div><pre><code>${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div>`;
 
+    const cheatView = `
+      <section class="lesson-section"><p class="sec-label">Формулы</p>${formulasBlock}</section>
+      <section class="lesson-section">${stepsBlock}</section>
+      <section class="lesson-section"><p class="sec-label">Пример</p>${exampleBlock}</section>
+      ${errors.length ? `<section class="lesson-section"><p class="sec-label">Типичные ошибки</p>${errorsBox}</section>` : ''}
+      ${hasCode ? `<section class="lesson-section"><p class="sec-label">Проверка кодом</p>${codePanel}</section>` : ''}`;
+
+    let fullNo = 0;
+    const fnum = () => String(++fullNo).padStart(2, '0');
+    const fullView = `
+      <section class="lesson-section" id="theory"><h2><span class="section-index">${fnum()}</span>Теория без воды</h2>
+        <p class="lead">${mathInline(task.theory)}</p>
+        ${formulasBlock}
+        <hr class="theory-divider">
+        ${stepsBlock}
+      </section>
+      <section class="lesson-section" id="example"><h2><span class="section-index">${fnum()}</span>Разбираем на примере</h2>
+        ${exampleBlock}
+      </section>
+      ${hasVideo ? `<section class="lesson-section" id="video"><h2><span class="section-index">${fnum()}</span>Видеоразбор</h2>
+        <div class="video-card"><div class="video-placeholder"><button class="video-play-button" aria-label="Загрузить видео">${icon('play')}</button><div class="video-info"><h3>${escapeHtml(task.videoTitle)}</h3><p>${escapeHtml(task.videoAuthor)} · загрузится после нажатия</p><a class="text-link" href="${task.video}" target="_blank" rel="noopener noreferrer">Открыть на сайте источника ↗</a></div></div></div>
+      </section>` : ''}
+      ${hasCode ? `<section class="lesson-section" id="code"><h2><span class="section-index">${fnum()}</span>Проверяем кодом</h2>
+        <div class="material-tabs" role="tablist"><button class="material-tab active" data-tab="code" role="tab">Python-код</button><button class="material-tab" data-tab="mistakes" role="tab">Типичные ошибки</button></div>
+        <div id="panel-code" role="tabpanel">${codePanel}</div>
+        <div id="panel-mistakes" role="tabpanel" hidden>${errorsBox}</div>
+      </section>` : (hasErrorsOnly ? `<section class="lesson-section" id="errors"><h2><span class="section-index">${fnum()}</span>Типичные ошибки</h2>${errorsBox}</section>` : '')}
+      ${practices.length ? `<section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${fnum()}</span>Тренировка</h2></div>
+        <div class="practice-area">${practices.map((p, i) => {
+          const saved = answers[i];
+          return `<article class="practice-card ${saved ? (saved.correct ? 'correct' : 'incorrect') : ''}" data-index="${i}">
+            <div class="practice-card-header"><span class="practice-label">Задача ${i + 1}</span><h3>${mathInline(p.text)}</h3></div>
+            <div class="practice-controls"><input class="answer-input" type="text" inputmode="text" placeholder="Твой ответ" value="${saved ? escapeHtml(saved.value) : ''}" autocomplete="off"><div class="practice-btns"><button class="hint-button" data-hint="${i}">Подсказка</button><button class="button button-primary" data-check="${i}">${icon('check')} Проверить</button></div></div>
+            <div class="practice-feedback"></div>
+          </article>`;
+        }).join('')}</div>
+      </section>` : ''}`;
+
+    const mode = storage.get('view-mode', 'cheat') === 'full' ? 'full' : 'cheat';
     root.innerHTML = `
       <div class="lesson-header">
         <div>
         <h1>${escapeHtml(task.title)}</h1><p class="lesson-description">${mathInline(escapeHtml(task.intro))}</p>
         <div class="lesson-meta"><span>${icon('clock')} ${task.time} мин чтения</span><span>${icon('check')} Уровень: ${task.level}</span>${hasCode ? `<span>${icon('code')} Python</span>` : ''}</div></div>
       </div>
-      <div class="lesson-layout">
+      <div class="lesson-toggle" role="tablist" aria-label="Режим страницы">
+        <button class="lt-btn${mode === 'cheat' ? ' active' : ''}" data-mode="cheat" role="tab" aria-selected="${mode === 'cheat'}">⚡ Шпаргалка</button>
+        <button class="lt-btn${mode === 'full' ? ' active' : ''}" data-mode="full" role="tab" aria-selected="${mode === 'full'}">Полный разбор</button>
+      </div>
+      <div class="lesson-layout" data-mode="${mode}">
         <div class="lesson-content">
-          <section class="lesson-section" id="theory"><h2><span class="section-index">${num()}</span>Теория без воды</h2>
-            <p class="lead">${mathInline(task.theory)}</p>
-            <div class="formula-grid">${(task.formulas || []).map(f => `<div class="formula-card"><h4>${escapeHtml(f[0])}</h4><p>${mathInline(f[1])}</p></div>`).join('')}</div>
-            <hr class="theory-divider">
-            <p class="sec-label">Алгоритм решения</p>
-            <ol class="algorithm-list">${(task.steps || []).map(s => `<li>${mathInline(s)}</li>`).join('')}</ol>
-          </section>
-          <section class="lesson-section" id="example"><h2><span class="section-index">${num()}</span>Разбираем на примере</h2>
-            <div class="worked-example"><div class="example-problem"><p>${mathInline(task.example.text)}</p></div><div class="example-solution"><p>${mathInline(task.example.solution)}</p><div class="example-answer">${icon('check')} Ответ: <strong>${mathInline(escapeHtml(task.example.answer))}</strong></div></div></div>
-          </section>
-          ${hasVideo ? `<section class="lesson-section" id="video"><h2><span class="section-index">${num()}</span>Видеоразбор</h2>
-            <div class="video-card"><div class="video-placeholder"><button class="video-play-button" aria-label="Загрузить видео">${icon('play')}</button><div class="video-info"><h3>${escapeHtml(task.videoTitle)}</h3><p>${escapeHtml(task.videoAuthor)} · загрузится после нажатия</p><a class="text-link" href="${task.video}" target="_blank" rel="noopener noreferrer">Открыть на сайте источника ↗</a></div></div></div>
-          </section>` : ''}
-          ${hasCode ? `<section class="lesson-section" id="code"><h2><span class="section-index">${num()}</span>Проверяем кодом</h2>
-            <div class="material-tabs" role="tablist"><button class="material-tab active" data-tab="code" role="tab">Python-код</button><button class="material-tab" data-tab="mistakes" role="tab">Типичные ошибки</button></div>
-            <div id="panel-code" role="tabpanel"><div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" id="copy-code">${icon('copy')} Копировать</button></div><pre><code id="code-block">${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div></div>
-            <div id="panel-mistakes" role="tabpanel" hidden>${errorsBox}</div>
-          </section>` : (hasErrorsOnly ? `<section class="lesson-section" id="errors"><h2><span class="section-index">${num()}</span>Типичные ошибки</h2>${errorsBox}</section>` : '')}
-          ${practices.length ? `<section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${num()}</span>Тренировка</h2></div>
-            <div class="practice-area">${practices.map((p, i) => {
-              const saved = answers[i];
-              return `<article class="practice-card ${saved ? (saved.correct ? 'correct' : 'incorrect') : ''}" data-index="${i}">
-                <div class="practice-card-header"><span class="practice-label">Задача ${i + 1}</span><h3>${mathInline(p.text)}</h3></div>
-                <div class="practice-controls"><input class="answer-input" type="text" inputmode="text" placeholder="Твой ответ" value="${saved ? escapeHtml(saved.value) : ''}" autocomplete="off"><div class="practice-btns"><button class="hint-button" data-hint="${i}">Подсказка</button><button class="button button-primary" data-check="${i}">${icon('check')} Проверить</button></div></div>
-                <div class="practice-feedback"></div>
-              </article>`;
-            }).join('')}</div>
-          </section>` : ''}
+          <div id="mode-cheat">${cheatView}</div>
+          <div id="mode-full">${fullView}</div>
           <nav class="lesson-nav">${prev ? `<a href="/task/?subject=${subjectId}&id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="/task/?subject=${subjectId}&id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
           <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
         </nav></div></aside>
       </div>`;
+
+    root.querySelectorAll('.lt-btn').forEach(b => b.addEventListener('click', () => {
+      root.querySelectorAll('.lt-btn').forEach(x => { x.classList.toggle('active', x === b); x.setAttribute('aria-selected', String(x === b)); });
+      root.querySelector('.lesson-layout').dataset.mode = b.dataset.mode;
+      storage.set('view-mode', b.dataset.mode);
+      window.scrollTo(0, 0);
+    }));
 
     root.querySelector('.video-play-button')?.addEventListener('click', () => {
       if (!embed) return;
@@ -159,10 +185,10 @@
       const item = btn.closest('.error-item'); const open = item.classList.toggle('expanded');
       btn.setAttribute('aria-expanded', open); item.querySelector('.error-detail').hidden = !open;
     }));
-    $('#copy-code')?.addEventListener('click', async () => {
+    root.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(task.code); window.showToast('Код скопирован в буфер обмена'); }
       catch { window.showToast('Не получилось скопировать — выдели код вручную'); }
-    });
+    }));
 
     const check = (card, index) => {
       const p = practices[index];
