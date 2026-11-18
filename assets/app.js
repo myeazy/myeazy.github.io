@@ -69,6 +69,12 @@
   const firstSubject = () => (activeExam()?.subjects || []).find(s => s.active)?.id || null;
   const subjectMeta = sid => activeExam().subjects.find(s => s.id === sid) || null;
   const taskUrl = (sid, id) => `/task/?subject=${sid}&id=${id}`;
+  const orderSubjects = subs => [...subs].sort((x, y) => {
+    if (x.id === currentSubject) return -1;
+    if (y.id === currentSubject) return 1;
+    if (x.active !== y.active) return x.active ? -1 : 1;
+    return x.name.localeCompare(y.name, 'ru');
+  });
 
   let currentSubject = storage.get('subject', firstSubject());
   if (!getTasks(currentSubject).length) currentSubject = firstSubject();
@@ -137,7 +143,7 @@
           <button class="acc-head disabled" type="button"><span class="acc-title">${exam.label}</span><span class="menu-soon">скоро</span>${CHEV}</button>
         </div>`;
       }
-      const subjects = exam.subjects.filter(s => s.inMenu).map(s => {
+      const subjects = orderSubjects(exam.subjects.filter(s => s.inMenu)).map(s => {
         if (!s.active) return `<button class="acc-head sub disabled" type="button"><span class="acc-title">${s.name}</span><span class="menu-soon">скоро</span></button>`;
         return `<div class="acc" data-acc="${s.id}">
           <button class="acc-head sub" aria-expanded="false"><span class="acc-title">${s.name}</span>${CHEV}</button>
@@ -242,6 +248,24 @@
     });
   }
 
+  const contribList = $('#contrib-list');
+  if (contribList) {
+    const renderContribs = list => {
+      contribList.innerHTML = list.map(c => `<a class="contrib" href="${c.html_url}" target="_blank" rel="noopener noreferrer"><img src="${c.avatar_url}" alt="${escapeHtml(c.login)}" loading="lazy"><span>${escapeHtml(c.login)}</span></a>`).join('');
+    };
+    const cached = storage.get('contributors', null);
+    if (cached && Date.now() - cached.at < 3600000) renderContribs(cached.list);
+    fetch('https://api.github.com/repos/myeazy/myeazy.github.io/contributors')
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('github')))
+      .then(list => {
+        if (Array.isArray(list) && list.length) {
+          storage.set('contributors', { at: Date.now(), list: list.map(c => ({ login: c.login, html_url: c.html_url, avatar_url: c.avatar_url })) });
+          renderContribs(list);
+        }
+      })
+      .catch(() => { if (!cached) contribList.innerHTML = '<p class="contrib-empty">Пока пусто — стань первым контрибьютором.</p>'; });
+  }
+
   const overlay = $('#search-overlay');
   if (overlay) {
     const input = $('#global-search');
@@ -264,6 +288,11 @@
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length; renderSearch(); }
       if (e.key === 'Enter' && matches[selected]) window.location.href = taskUrl(matches[selected]._sid, matches[selected].id);
     });
+  }
+
+  if (history.pushState && location.pathname !== '/' && location.pathname !== '/app/') {
+    history.pushState({ eazyGuard: true }, '', location.href);
+    window.addEventListener('popstate', () => { window.location.href = '/app/'; });
   }
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
