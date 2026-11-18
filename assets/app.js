@@ -10,6 +10,10 @@
   };
   window.Yasno = { $, $$, icon, escapeHtml, storage };
 
+  const CATALOG = Array.isArray(window.CATALOG) ? window.CATALOG : [];
+  const getTasks = typeof window.getTasks === 'function' ? window.getTasks : () => [];
+  const brokenMsg = '<div class="empty-state"><h3>Кажется, с сайтом беда 🛠</h3><p>Данные не загрузились. Напиши нам — починим быстро.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px"><a class="button button-primary" href="https://t.me/eazy_official" target="_blank" rel="noopener noreferrer">Telegram</a><a class="button button-secondary" href="https://github.com/myeazy/myeazy.github.io/issues" target="_blank" rel="noopener noreferrer">GitHub</a></div></div>';
+
   function applyTheme(dark) {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     $$('#menu-theme use').forEach(u => u.setAttribute('href', dark ? '#i-sun' : '#i-moon'));
@@ -61,13 +65,13 @@
     window.toastTimer = setTimeout(() => toast.classList.remove('visible'), 2800);
   };
 
-  const activeExam = () => window.CATALOG.find(e => e.active) || window.CATALOG[0];
-  const firstSubject = () => activeExam().subjects.find(s => s.active)?.id || 'informatika';
+  const activeExam = () => CATALOG.find(e => e.active) || CATALOG[0];
+  const firstSubject = () => (activeExam()?.subjects || []).find(s => s.active)?.id || null;
   const subjectMeta = sid => activeExam().subjects.find(s => s.id === sid) || null;
   const taskUrl = (sid, id) => `/task/?subject=${sid}&id=${id}`;
 
   let currentSubject = storage.get('subject', firstSubject());
-  if (!window.getTasks(currentSubject).length) currentSubject = firstSubject();
+  if (!getTasks(currentSubject).length) currentSubject = firstSubject();
 
   function taskCard(task, sid) {
     const card = task.ready ? 'a' : 'article';
@@ -80,10 +84,16 @@
   }
 
   const catalogGrid = $('#catalog-grid');
-  if (catalogGrid) {
+  if (catalogGrid && !firstSubject()) {
+    catalogGrid.innerHTML = brokenMsg;
+    $('#catalog-empty').hidden = true;
+    const cs = $('#catalog-search');
+    if (cs) cs.disabled = true;
+  }
+  if (catalogGrid && firstSubject()) {
     const renderCatalog = () => {
       const query = ($('#catalog-search').value || '').trim().toLowerCase();
-      const list = window.getTasks(currentSubject).filter(task => {
+      const list = getTasks(currentSubject).filter(task => {
         const haystack = [task.id, task.title, task.short, ...(task.tags || [])].join(' ').toLowerCase();
         return haystack.includes(query);
       });
@@ -100,7 +110,7 @@
     syncSubjectLabel();
     window.addEventListener('eazy:subject', e => {
       const sid = e.detail;
-      if (!window.getTasks(sid).length) return;
+      if (!getTasks(sid).length) return;
       currentSubject = sid;
       storage.set('subject', sid);
       syncSubjectLabel();
@@ -109,9 +119,9 @@
     renderCatalog();
   }
 
-  const allSearchable = () => window.CATALOG.filter(e => e.active).flatMap(e =>
+  const allSearchable = () => CATALOG.filter(e => e.active).flatMap(e =>
     e.subjects.filter(s => s.active).flatMap(s =>
-      window.getTasks(s.id).map(t => ({ ...t, _sid: s.id, _sname: s.name }))));
+      getTasks(s.id).map(t => ({ ...t, _sid: s.id, _sname: s.name }))));
   const taskMatches = query => {
     const q = query.trim().toLowerCase();
     return allSearchable().filter(t => [t.id, t.title, t.short, t._sname, ...(t.tags || [])].join(' ').toLowerCase().includes(q));
@@ -121,7 +131,7 @@
   const menuBtn = $('.menu-btn');
   if (menuBtn) {
     const CHEV = '<svg class="acc-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
-    const menuExams = window.CATALOG.map(exam => {
+    const menuExams = CATALOG.length ? CATALOG.map(exam => {
       if (!exam.active) {
         return `<div class="acc" data-acc="${exam.id}">
           <button class="acc-head disabled" type="button"><span class="acc-title">${exam.label}</span><span class="menu-soon">скоро</span>${CHEV}</button>
@@ -131,14 +141,14 @@
         if (!s.active) return `<button class="acc-head sub disabled" type="button"><span class="acc-title">${s.name}</span><span class="menu-soon">скоро</span></button>`;
         return `<div class="acc" data-acc="${s.id}">
           <button class="acc-head sub" aria-expanded="false"><span class="acc-title">${s.name}</span>${CHEV}</button>
-          <div class="acc-body"><div class="menu-tasks">${window.getTasks(s.id).map(t => `<a href="${taskUrl(s.id, t.id)}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
+          <div class="acc-body"><div class="menu-tasks">${getTasks(s.id).map(t => `<a href="${taskUrl(s.id, t.id)}"${t.ready ? '' : ' class="off"'}>№${t.id}</a>`).join('')}</div></div>
         </div>`;
       }).join('');
       return `<div class="acc open" data-acc="${exam.id}">
         <button class="acc-head open" aria-expanded="true"><span class="acc-title">${exam.label}</span>${CHEV}</button>
         <div class="acc-body open">${subjects}</div>
       </div>`;
-    }).join('');
+    }).join('') : '<div class="search-placeholder">Кажется, с сайтом беда — напиши нам: t.me/eazy_official</div>';
 
     const ov = document.createElement('div');
     ov.className = 'menu-overlay';
@@ -202,7 +212,7 @@
       if (!menuSearch.value.trim()) { menuResults.hidden = true; menuNav.hidden = false; return; }
       const q = menuSearch.value.trim().toLowerCase();
       const rows = [];
-      window.CATALOG.forEach(exam => {
+      CATALOG.forEach(exam => {
         if (exam.label.toLowerCase().includes(q)) rows.push({ title: exam.label, sub: exam.active ? 'Каталог заданий' : 'раздел скоро появится', href: exam.active ? '/app/' : null });
         exam.subjects.forEach(s => {
           if (s.name.toLowerCase().includes(q) || s.caseForm.includes(q)) rows.push({ title: s.name, sub: exam.label + (s.active ? ' · каталог' : ' · скоро'), href: s.active ? '/app/' : null });
