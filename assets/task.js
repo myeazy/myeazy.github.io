@@ -27,6 +27,27 @@
     });
     return s.replace(/\b(ip_network|product|max|min|abs|count)\b/g, '<span class="code-function">$1</span>');
   }
+  function mathTex(src) {
+    const GREEK = { alpha:'\u03b1', beta:'\u03b2', gamma:'\u03b3', delta:'\u03b4', theta:'\u03b8', lambda:'\u03bb', mu:'\u03bc', pi:'\u03c0', sigma:'\u03c3', phi:'\u03c6', varphi:'\u03c6', omega:'\u03c9' };
+    const OPS = { cdot:'\u00b7', times:'\u00d7', pm:'\u00b1', geq:'\u2265', leq:'\u2264', neq:'\u2260', to:'\u2192', Rightarrow:'\u21d2', infty:'\u221e', deg:'\u00b0', approx:'\u2248', in:'\u2208' };
+    const FN = ['log', 'ln', 'sin', 'cos', 'tg', 'ctg', 'lim', 'min', 'max'];
+    let s = escapeHtml(src);
+    let prev;
+    do {
+      prev = s;
+      s = s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/, '<span class="m-frac"><span class="m-num">$1</span><span class="m-den">$2</span></span>');
+    } while (s !== prev);
+    s = s.replace(/\\sqrt\[([^\]]*)\]\{([^{}]*)\}/g, '<span class="m-sqrt"><span class="m-root">$1</span>\u221a<span class="m-sqrt-body">$2</span></span>');
+    s = s.replace(/\\sqrt\{([^{}]*)\}/g, '<span class="m-sqrt">\u221a<span class="m-sqrt-body">$1</span></span>');
+    s = s.replace(/\\vec\{([^{}]*)\}/g, '<span class="m-vec">$1</span>');
+    s = s.replace(/\\([a-zA-Z]+)/g, (m, name) => GREEK[name] || OPS[name] || (FN.includes(name) ? '<span class="m-fn">' + name + '</span>' : name));
+    s = s.replace(/\^\{([^{}]*)\}/g, '<sup>$1</sup>').replace(/\^(\S)/g, '<sup>$1</sup>');
+    s = s.replace(/_\{([^{}]*)\}/g, '<sub>$1</sub>').replace(/_(\S)/g, '<sub>$1</sub>');
+    return '<span class="m">' + s + '</span>';
+  }
+  function mathInline(html) {
+    return String(html).replace(/\$([^$]+)\$/g, (m, tex) => mathTex(tex));
+  }
   function videoEmbed(url) {
     let embed = null;
     const yt = value => (value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/) || [])[1];
@@ -78,25 +99,25 @@
     let secNo = 0;
     const num = () => String(++secNo).padStart(2, '0');
 
-    const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${escapeHtml(e)}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
+    const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${mathInline(escapeHtml(e))}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
 
     root.innerHTML = `
       <div class="lesson-header">
         <div>
-        <h1>${escapeHtml(task.title)}</h1><p class="lesson-description">${escapeHtml(task.intro)}</p>
+        <h1>${escapeHtml(task.title)}</h1><p class="lesson-description">${mathInline(escapeHtml(task.intro))}</p>
         <div class="lesson-meta"><span>${icon('clock')} ${task.time} мин чтения</span><span>${icon('check')} Уровень: ${task.level}</span>${hasCode ? `<span>${icon('code')} Python</span>` : ''}</div></div>
       </div>
       <div class="lesson-layout">
         <div class="lesson-content">
           <section class="lesson-section" id="theory"><h2><span class="section-index">${num()}</span>Теория без воды</h2>
-            <p class="lead">${task.theory}</p>
-            <div class="formula-grid">${(task.formulas || []).map(f => `<div class="formula-card"><h4>${escapeHtml(f[0])}</h4><p>${f[1]}</p></div>`).join('')}</div>
+            <p class="lead">${mathInline(task.theory)}</p>
+            <div class="formula-grid">${(task.formulas || []).map(f => `<div class="formula-card"><h4>${escapeHtml(f[0])}</h4><p>${mathInline(f[1])}</p></div>`).join('')}</div>
             <hr class="theory-divider">
             <p class="sec-label">Алгоритм решения</p>
-            <ol class="algorithm-list">${(task.steps || []).map(s => `<li>${s}</li>`).join('')}</ol>
+            <ol class="algorithm-list">${(task.steps || []).map(s => `<li>${mathInline(s)}</li>`).join('')}</ol>
           </section>
           <section class="lesson-section" id="example"><h2><span class="section-index">${num()}</span>Разбираем на примере</h2>
-            <div class="worked-example"><div class="example-problem"><p>${task.example.text}</p></div><div class="example-solution"><p>${task.example.solution}</p><div class="example-answer">${icon('check')} Ответ: <strong>${escapeHtml(task.example.answer)}</strong></div></div></div>
+            <div class="worked-example"><div class="example-problem"><p>${mathInline(task.example.text)}</p></div><div class="example-solution"><p>${mathInline(task.example.solution)}</p><div class="example-answer">${icon('check')} Ответ: <strong>${mathInline(escapeHtml(task.example.answer))}</strong></div></div></div>
           </section>
           ${hasVideo ? `<section class="lesson-section" id="video"><h2><span class="section-index">${num()}</span>Видеоразбор</h2>
             <div class="video-card"><div class="video-placeholder"><button class="video-play-button" aria-label="Загрузить видео">${icon('play')}</button><div class="video-info"><h3>${escapeHtml(task.videoTitle)}</h3><p>${escapeHtml(task.videoAuthor)} · загрузится после нажатия</p><a class="text-link" href="${task.video}" target="_blank" rel="noopener noreferrer">Открыть на сайте источника ↗</a></div></div></div>
@@ -110,7 +131,7 @@
             <div class="practice-area">${practices.map((p, i) => {
               const saved = answers[i];
               return `<article class="practice-card ${saved ? (saved.correct ? 'correct' : 'incorrect') : ''}" data-index="${i}">
-                <div class="practice-card-header"><span class="practice-label">Задача ${i + 1}</span><h3>${p.text}</h3></div>
+                <div class="practice-card-header"><span class="practice-label">Задача ${i + 1}</span><h3>${mathInline(p.text)}</h3></div>
                 <div class="practice-controls"><input class="answer-input" type="text" inputmode="text" placeholder="Твой ответ" value="${saved ? escapeHtml(saved.value) : ''}" autocomplete="off"><div class="practice-btns"><button class="hint-button" data-hint="${i}">Подсказка</button><button class="button button-primary" data-check="${i}">${icon('check')} Проверить</button></div></div>
                 <div class="practice-feedback"></div>
               </article>`;
@@ -151,7 +172,7 @@
       if (!value.trim()) { window.showToast('Сначала введи ответ'); inputEl.focus(); return; }
       const correct = p.accepted.some(a => normalize(a) === normalize(value));
       card.classList.remove('correct', 'incorrect'); card.classList.add(correct ? 'correct' : 'incorrect');
-      feedback.innerHTML = correct ? `<strong>Верно.</strong><div class="answer-explanation">${p.explanation}</div>` : `<strong>Не сходится.</strong> Правильный ответ: <strong>${escapeHtml(p.answer)}</strong>.<div class="answer-explanation">${p.explanation}</div>`;
+      feedback.innerHTML = correct ? `<strong>Верно.</strong><div class="answer-explanation">${mathInline(p.explanation)}</div>` : `<strong>Не сходится.</strong> Правильный ответ: <strong>${mathInline(escapeHtml(p.answer))}</strong>.<div class="answer-explanation">${mathInline(p.explanation)}</div>`;
       const cur = storage.get(`answers-${subjectId}-${task.id}`, {});
       cur[index] = { value, correct }; storage.set(`answers-${subjectId}-${task.id}`, cur);
       if (correct) { inputEl.setAttribute('aria-invalid', 'false'); window.showToast('Верно! Так держать'); }
@@ -161,7 +182,7 @@
     root.querySelectorAll('[data-hint]').forEach(btn => btn.addEventListener('click', () => {
       const card = btn.closest('.practice-card');
       if (card.querySelector('.practice-hint')) { card.querySelector('.practice-hint').remove(); return; }
-      card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${practices[Number(btn.dataset.hint)].hint}</div>`);
+      card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${mathInline(practices[Number(btn.dataset.hint)].hint)}</div>`);
     }));
 
     const links = root.querySelectorAll('.toc a');
