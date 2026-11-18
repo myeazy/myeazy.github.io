@@ -1,9 +1,12 @@
 (() => {
   'use strict';
-  const activeExam = window.CATALOG.find(e => e.active) || window.CATALOG[0];
-  const DATA = {
-    exam: { items: window.CATALOG.map(e => ({ label: e.label, active: e.active })) },
-    subject: { items: activeExam.subjects.map(s => ({ label: s.caseForm, active: s.active })) },
+  const { storage } = window.Yasno;
+  const exam = () => window.CATALOG.find(e => e.active) || window.CATALOG[0];
+
+  const itemsFor = key => {
+    if (key === 'exam') return window.CATALOG.map(e => ({ id: e.id, label: e.label, enabled: e.active, current: e.active }));
+    const cur = storage.get('subject', '');
+    return exam().subjects.map(s => ({ id: s.id, label: s.caseForm, enabled: s.active, current: s.id === cur }));
   };
 
   let openPop = null;
@@ -28,16 +31,19 @@
 
     const list = pop.querySelector('.select-pop-list');
     const input = pop.querySelector('input');
+    const items = itemsFor(key);
     const render = q => {
       const query = (q || '').trim().toLowerCase();
-      const items = DATA[key].items.filter(i => i.label.toLowerCase().includes(query));
-      list.innerHTML = items.length ? items.map(i => `
-        <button class="select-pop-item ${i.active ? 'active-item' : 'disabled'}" role="option" aria-selected="${i.active}">
-          ${i.label}${i.active ? '' : '<span class="soon">скоро</span>'}
+      const filtered = items.filter(i => i.label.toLowerCase().includes(query));
+      list.innerHTML = filtered.length ? filtered.map(i => `
+        <button class="select-pop-item ${i.current ? 'active-item' : ''}${i.enabled ? '' : ' disabled'}" role="option" aria-selected="${i.current}" data-id="${i.id}">
+          ${i.label}${i.enabled ? '' : '<span class="soon">скоро</span>'}
         </button>`).join('') : '<div class="select-pop-empty">Ничего не найдено</div>';
       list.querySelectorAll('.select-pop-item').forEach(el => el.addEventListener('click', () => {
-        if (el.classList.contains('active-item')) closePop();
-        else window.showToast?.('Этот раздел скоро появится');
+        const item = items.find(i => i.id === el.dataset.id);
+        if (!item || !item.enabled) { window.showToast?.('Этот раздел скоро появится'); return; }
+        closePop();
+        if (!item.current && key === 'subject') window.dispatchEvent(new CustomEvent('eazy:subject', { detail: item.id }));
       }));
     };
     render('');

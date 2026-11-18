@@ -1,4 +1,5 @@
-window.TASKS = [
+window.TASKS = {
+  informatika: [
   {
     id: 1,
     title: "Анализ информационных моделей",
@@ -374,8 +375,10 @@ window.TASKS = [
     ],
     difficulty: "high"
   }
-];
-window.getTask = id => window.TASKS.find(t => t.id === Number(id));
+]
+};
+window.getTasks = sid => window.TASKS[sid] || [];
+window.getTask = (id, sid) => window.getTasks(sid || 'informatika').find(t => t.id === Number(id));
 
 window.CATALOG = [
   {
