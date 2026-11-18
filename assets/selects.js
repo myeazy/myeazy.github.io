@@ -6,7 +6,12 @@
   const itemsFor = key => {
     if (key === 'exam') return window.CATALOG.map(e => ({ id: e.id, label: e.label, enabled: e.active, current: e.active }));
     const cur = storage.get('subject', '');
-    return exam().subjects.map(s => ({ id: s.id, label: s.caseForm, enabled: s.active, current: s.id === cur }));
+    return [...exam().subjects].sort((x, y) => {
+      if (x.id === cur) return -1;
+      if (y.id === cur) return 1;
+      if (x.active !== y.active) return x.active ? -1 : 1;
+      return x.name.localeCompare(y.name, 'ru');
+    }).map(s => ({ id: s.id, label: s.caseForm, enabled: s.active, current: s.id === cur }));
   };
 
   let openPop = null;
