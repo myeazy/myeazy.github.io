@@ -7,7 +7,7 @@ window.TASKS = {
     category: "theory",
     level: "Базовый",
     time: 3,
-    ready: false,
+    ready: true,
     tags: [
       "графы",
       "таблицы",
@@ -384,7 +384,7 @@ window.TASKS = {
     category: "theory",
     level: "Базовый",
     time: 3,
-    ready: false,
+    ready: true,
     tags: ["планиметрия", "треугольники", "окружности"]
   },
   {
