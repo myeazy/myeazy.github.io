@@ -167,3 +167,11 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .m-root{font-size:.72em;vertical-align:super;font-style:normal}
 .m-vec{position:relative;display:inline-block;padding-right:1px}
 .m-vec::after{content:'\2192';position:absolute;left:0;right:0;top:-.58em;text-align:center;font-size:.6em;font-style:normal;line-height:1}
+
+.lesson-toggle{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:99px;padding:3px;background:var(--surface);margin-bottom:22px}
+.lt-btn{border:0;background:transparent;padding:8px 20px;border-radius:99px;font-size:13px;font-weight:700;color:var(--muted);font-family:inherit;cursor:pointer;transition:color .15s}
+.lt-btn.active{background:var(--ink);color:var(--bg)}
+.lesson-layout[data-mode="cheat"] #mode-full{display:none}
+.lesson-layout[data-mode="full"] #mode-cheat{display:none}
+.lesson-layout[data-mode="cheat"] .lesson-aside{display:none}
+#mode-cheat .lesson-section{margin-bottom:24px}
