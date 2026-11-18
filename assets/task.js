@@ -3,10 +3,11 @@
   const { $, icon, escapeHtml, storage } = window.Yasno;
   const params = new URLSearchParams(location.search);
   const id = Number(params.get('id'));
-  const fallbackSubject = (window.CATALOG.find(e => e.active) || window.CATALOG[0]).subjects.find(s => s.active)?.id || 'informatika';
-  const subjectId = params.get('subject') || fallbackSubject;
-  const taskMeta = window.getTask(id, subjectId);
-  const subjectName = (window.CATALOG.flatMap(e => e.subjects).find(s => s.id === subjectId) || {}).name || subjectId;
+  const dataOk = typeof window.getTask === 'function' && typeof window.getTasks === 'function' && Array.isArray(window.CATALOG) && window.CATALOG.some(e => e.active && e.subjects.some(s => s.active));
+  const firstActiveSubject = dataOk ? ((window.CATALOG.find(e => e.active) || window.CATALOG[0]).subjects.find(s => s.active) || {}).id : null;
+  const subjectId = params.get('subject') || firstActiveSubject;
+  const taskMeta = dataOk && subjectId ? window.getTask(id, subjectId) : null;
+  const subjectName = dataOk ? ((window.CATALOG.flatMap(e => e.subjects).find(s => s.id === subjectId) || {}).name || subjectId) : subjectId;
   const root = $('#lesson-content');
   let task = null;
 
@@ -37,6 +38,12 @@
     function urlSafe(v) { return typeof v === 'string' ? v : ''; }
   }
 
+  function renderBroken() {
+    document.title = 'Что-то сломалось — EAZY';
+    $('#breadcrumb-task').textContent = 'Ошибка';
+    root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Кажется, с сайтом беда 🛠</h2><p>Данные не загрузились так, как надо. Напиши нам — починим быстро.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><a class="button button-primary" href="https://t.me/eazy_official" target="_blank" rel="noopener noreferrer">Написать в Telegram</a><a class="button button-secondary" href="https://github.com/myeazy/myeazy.github.io/issues" target="_blank" rel="noopener noreferrer">Issue на GitHub</a></div></div>`;
+  }
+
   function render() {
     const content = (window.EAZY_CONTENT || {})[id] || null;
     task = taskMeta ? { ...taskMeta, ...(content || {}) } : null;
@@ -61,36 +68,46 @@
     const next = subjectTasks.find(t => t.ready && t.id > task.id) || subjectTasks.find(t => t.ready);
     const prev = [...subjectTasks].reverse().find(t => t.ready && t.id < task.id);
     const embed = task.video ? videoEmbed(task.video) : null;
-    const answers = storage.get(`answers-${task.id}`, {});
+    const answers = storage.get(`answers-${subjectId}-${task.id}`, {});
+
+    const hasVideo = !!task.video;
+    const hasCode = !!task.code;
+    const errors = task.errors || [];
+    const hasErrorsOnly = !hasCode && errors.length > 0;
+    const practices = task.practices || [];
+    let secNo = 0;
+    const num = () => String(++secNo).padStart(2, '0');
+
+    const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${escapeHtml(e)}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
 
     root.innerHTML = `
       <div class="lesson-header">
         <div>
         <h1>${escapeHtml(task.title)}</h1><p class="lesson-description">${escapeHtml(task.intro)}</p>
-        <div class="lesson-meta"><span>${icon('clock')} ${task.time} мин чтения</span><span>${icon('check')} Уровень: ${task.level}</span><span>${icon('code')} Python</span></div></div>
+        <div class="lesson-meta"><span>${icon('clock')} ${task.time} мин чтения</span><span>${icon('check')} Уровень: ${task.level}</span>${hasCode ? `<span>${icon('code')} Python</span>` : ''}</div></div>
       </div>
       <div class="lesson-layout">
         <div class="lesson-content">
-          <section class="lesson-section" id="theory"><h2><span class="section-index">01</span>Теория без воды</h2>
+          <section class="lesson-section" id="theory"><h2><span class="section-index">${num()}</span>Теория без воды</h2>
             <p class="lead">${task.theory}</p>
-            <div class="formula-grid">${task.formulas.map(f => `<div class="formula-card"><h4>${escapeHtml(f[0])}</h4><p>${f[1]}</p></div>`).join('')}</div>
+            <div class="formula-grid">${(task.formulas || []).map(f => `<div class="formula-card"><h4>${escapeHtml(f[0])}</h4><p>${f[1]}</p></div>`).join('')}</div>
             <hr class="theory-divider">
             <p class="sec-label">Алгоритм решения</p>
-            <ol class="algorithm-list">${task.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+            <ol class="algorithm-list">${(task.steps || []).map(s => `<li>${s}</li>`).join('')}</ol>
           </section>
-          <section class="lesson-section" id="example"><h2><span class="section-index">02</span>Разбираем на примере</h2>
+          <section class="lesson-section" id="example"><h2><span class="section-index">${num()}</span>Разбираем на примере</h2>
             <div class="worked-example"><div class="example-problem"><p>${task.example.text}</p></div><div class="example-solution"><p>${task.example.solution}</p><div class="example-answer">${icon('check')} Ответ: <strong>${escapeHtml(task.example.answer)}</strong></div></div></div>
           </section>
-          ${task.video ? `<section class="lesson-section" id="video"><h2><span class="section-index">03</span>Видеоразбор</h2>
+          ${hasVideo ? `<section class="lesson-section" id="video"><h2><span class="section-index">${num()}</span>Видеоразбор</h2>
             <div class="video-card"><div class="video-placeholder"><button class="video-play-button" aria-label="Загрузить видео">${icon('play')}</button><div class="video-info"><h3>${escapeHtml(task.videoTitle)}</h3><p>${escapeHtml(task.videoAuthor)} · загрузится после нажатия</p><a class="text-link" href="${task.video}" target="_blank" rel="noopener noreferrer">Открыть на сайте источника ↗</a></div></div></div>
           </section>` : ''}
-          <section class="lesson-section" id="code"><h2><span class="section-index">${task.video ? '04' : '03'}</span>Проверяем кодом</h2>
+          ${hasCode ? `<section class="lesson-section" id="code"><h2><span class="section-index">${num()}</span>Проверяем кодом</h2>
             <div class="material-tabs" role="tablist"><button class="material-tab active" data-tab="code" role="tab">Python-код</button><button class="material-tab" data-tab="mistakes" role="tab">Типичные ошибки</button></div>
             <div id="panel-code" role="tabpanel"><div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" id="copy-code">${icon('copy')} Копировать</button></div><pre><code id="code-block">${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div></div>
-            <div id="panel-mistakes" role="tabpanel" hidden><div class="errors-box">${task.errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${escapeHtml(e)}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div></div>
-          </section>
-          <section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${task.video ? '05' : '04'}</span>Тренировка</h2></div>
-            <div class="practice-area">${task.practices.map((p, i) => {
+            <div id="panel-mistakes" role="tabpanel" hidden>${errorsBox}</div>
+          </section>` : (hasErrorsOnly ? `<section class="lesson-section" id="errors"><h2><span class="section-index">${num()}</span>Типичные ошибки</h2>${errorsBox}</section>` : '')}
+          ${practices.length ? `<section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${num()}</span>Тренировка</h2></div>
+            <div class="practice-area">${practices.map((p, i) => {
               const saved = answers[i];
               return `<article class="practice-card ${saved ? (saved.correct ? 'correct' : 'incorrect') : ''}" data-index="${i}">
                 <div class="practice-card-header"><span class="practice-label">Задача ${i + 1}</span><h3>${p.text}</h3></div>
@@ -98,11 +115,11 @@
                 <div class="practice-feedback"></div>
               </article>`;
             }).join('')}</div>
-          </section>
+          </section>` : ''}
           <nav class="lesson-nav">${prev ? `<a href="/task/?subject=${subjectId}&id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="/task/?subject=${subjectId}&id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
-          <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${task.video ? '<a href="#video">Видеоразбор</a>' : ''}<a href="#code">Код и ошибки</a><a href="#practice">Тренировка</a>
+          <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
         </nav></div></aside>
       </div>`;
 
@@ -121,13 +138,13 @@
       const item = btn.closest('.error-item'); const open = item.classList.toggle('expanded');
       btn.setAttribute('aria-expanded', open); item.querySelector('.error-detail').hidden = !open;
     }));
-    $('#copy-code').addEventListener('click', async () => {
+    $('#copy-code')?.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(task.code); window.showToast('Код скопирован в буфер обмена'); }
       catch { window.showToast('Не получилось скопировать — выдели код вручную'); }
     });
 
     const check = (card, index) => {
-      const p = task.practices[index];
+      const p = practices[index];
       const inputEl = card.querySelector('.answer-input');
       const feedback = card.querySelector('.practice-feedback');
       const value = inputEl.value;
@@ -135,8 +152,8 @@
       const correct = p.accepted.some(a => normalize(a) === normalize(value));
       card.classList.remove('correct', 'incorrect'); card.classList.add(correct ? 'correct' : 'incorrect');
       feedback.innerHTML = correct ? `<strong>Верно.</strong><div class="answer-explanation">${p.explanation}</div>` : `<strong>Не сходится.</strong> Правильный ответ: <strong>${escapeHtml(p.answer)}</strong>.<div class="answer-explanation">${p.explanation}</div>`;
-      const cur = storage.get(`answers-${task.id}`, {});
-      cur[index] = { value, correct }; storage.set(`answers-${task.id}`, cur);
+      const cur = storage.get(`answers-${subjectId}-${task.id}`, {});
+      cur[index] = { value, correct }; storage.set(`answers-${subjectId}-${task.id}`, cur);
       if (correct) { inputEl.setAttribute('aria-invalid', 'false'); window.showToast('Верно! Так держать'); }
     };
     root.querySelectorAll('[data-check]').forEach(btn => btn.addEventListener('click', () => check(btn.closest('.practice-card'), Number(btn.dataset.check))));
@@ -144,7 +161,7 @@
     root.querySelectorAll('[data-hint]').forEach(btn => btn.addEventListener('click', () => {
       const card = btn.closest('.practice-card');
       if (card.querySelector('.practice-hint')) { card.querySelector('.practice-hint').remove(); return; }
-      card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${task.practices[Number(btn.dataset.hint)].hint}</div>`);
+      card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${practices[Number(btn.dataset.hint)].hint}</div>`);
     }));
 
     const links = root.querySelectorAll('.toc a');
@@ -167,5 +184,5 @@
     s.onload = s.onerror = () => done();
     document.head.appendChild(s);
   };
-  document.addEventListener('DOMContentLoaded', () => loadContent(render));
+  document.addEventListener('DOMContentLoaded', () => dataOk ? loadContent(render) : renderBroken());
 })();
