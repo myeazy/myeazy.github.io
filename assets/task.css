@@ -157,7 +157,7 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .select-pop-item .soon{margin-left:auto;font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px}
 .select-pop-empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
 
-.m{font-family:Georgia,'Times New Roman',serif;font-style:italic;white-space:nowrap;font-size:1.02em}
+.m{font-style:italic;overflow-wrap:break-word}
 .m sup,.m sub{font-style:normal}
 .m-fn{font-style:normal}
 .m-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.25}
@@ -165,5 +165,5 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .m-den{padding:1px 4px 0}
 .m-sqrt-body{border-top:1.5px solid currentColor;padding:0 2px}
 .m-root{font-size:.72em;vertical-align:super;font-style:normal}
-.m-vec{position:relative;padding:0 1px}
-.m-vec::after{content:'\2192';position:absolute;left:0;right:0;top:-.68em;text-align:center;font-size:.62em;font-style:normal;line-height:1}
+.m-vec{position:relative;display:inline-block;padding-right:1px}
+.m-vec::after{content:'\2192';position:absolute;left:0;right:0;top:-.58em;text-align:center;font-size:.6em;font-style:normal;line-height:1}
