@@ -168,9 +168,9 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .m-vec{position:relative;display:inline-block;padding-right:1px}
 .m-vec::after{content:'\2192';position:absolute;left:0;right:0;top:-.58em;text-align:center;font-size:.6em;font-style:normal;line-height:1}
 
-.lesson-toggle{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:99px;padding:3px;background:var(--surface);margin-bottom:22px}
-.lt-btn{border:0;background:transparent;padding:8px 20px;border-radius:99px;font-size:13px;font-weight:700;color:var(--muted);font-family:inherit;cursor:pointer;transition:color .15s}
-.lt-btn.active{background:var(--ink);color:var(--bg)}
+.lesson-toggle{display:flex;gap:4px;border:1px solid var(--line);border-radius:14px;padding:4px;background:var(--surface);margin-bottom:22px;width:100%}
+.lt-btn{flex:1;border:0;background:transparent;padding:11px 12px;border-radius:11px;font-size:13.5px;font-weight:700;color:var(--muted);font-family:inherit;cursor:pointer;transition:background .18s,color .18s;display:flex;align-items:center;justify-content:center;gap:7px}
+.lt-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 14px #e4501e40}
 .lesson-layout[data-mode="cheat"] #mode-full{display:none}
 .lesson-layout[data-mode="full"] #mode-cheat{display:none}
 .lesson-layout[data-mode="cheat"] .lesson-aside{display:none}
