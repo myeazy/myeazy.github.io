@@ -196,7 +196,7 @@
     $('#lesson-share')?.addEventListener('click', () => {
       const data = {
         title: `Задание ${task.id}: ${task.title} — EAZY`,
-        text: `Смотри, я нашёл разбор задания ${task.id} ЕГЭ по ${subjectCase} — EAZY`,
+        text: `🔥 Смотри, я нашёл разбор задания ${task.id} ЕГЭ по ${subjectCase}. Попробуй решить сам — это проще, чем кажется!`,
         url: location.href
       };
       if (shareLink) { shareLink(data); return; }
