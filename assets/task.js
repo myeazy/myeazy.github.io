@@ -102,8 +102,6 @@
     const prev = ready.length > 1 ? ready[(readyIdx - 1 + ready.length) % ready.length] : null;
     const embed = task.video ? videoEmbed(task.video) : null;
     const answers = storage.get(`answers-${subjectId}-${task.id}`, {});
-    const doneKey = `done-${subjectId}-${task.id}`;
-    const isDone = storage.get(doneKey, false);
 
     const hasVideo = !!task.video;
     const hasCode = !!task.code;
@@ -161,10 +159,13 @@
     const mode = storage.get('view-mode', 'cheat') === 'full' ? 'full' : 'cheat';
     root.innerHTML = `
       <div class="lesson-header">
-        <div>
-        <h1>${escapeHtml(task.title)}</h1><p class="lesson-description">${mathInline(escapeHtml(task.intro))}</p>
-        <div class="lesson-meta"><span>${icon('clock')} ${task.time} мин чтения</span><span>${icon('check')} Уровень: ${task.level}</span>${hasCode ? `<span>${icon('code')} Python</span>` : ''}</div></div>
-        <button class="lesson-done${isDone ? ' is-done' : ''}" id="lesson-done" type="button" aria-pressed="${isDone}">${isDone ? '✓ Пройдено' : 'Отметить пройденным'}</button>
+        <div class="lesson-head-main">
+          <h1>${escapeHtml(task.title)}</h1>
+          <p class="lesson-description">${mathInline(escapeHtml(task.intro))}</p>
+        </div>
+        <button class="lesson-share" id="lesson-share" type="button" aria-label="Поделиться разбором" title="Поделиться разбором">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </button>
       </div>
       <div class="lesson-toggle" role="tablist" aria-label="Режим страницы">
         <button class="lt-btn${mode === 'cheat' ? ' active' : ''}" data-mode="cheat" role="tab" aria-selected="${mode === 'cheat'}">⚡ Шпаргалка</button>
@@ -188,14 +189,16 @@
       window.scrollTo(0, 0);
     }));
 
-    const doneBtn = $('#lesson-done');
-    doneBtn?.addEventListener('click', () => {
-      const now = !storage.get(doneKey, false);
-      storage.set(doneKey, now);
-      doneBtn.classList.toggle('is-done', now);
-      doneBtn.setAttribute('aria-pressed', String(now));
-      doneBtn.textContent = now ? '✓ Пройдено' : 'Отметить пройденным';
-      window.showToast(now ? 'Разбор отмечен пройденным' : 'Отметка о прохождении снята');
+    $('#lesson-share')?.addEventListener('click', async () => {
+      const url = location.href;
+      const data = { title: `Задание ${task.id}: ${task.title} — EAZY`, text: task.short || task.title, url };
+      try {
+        if (navigator.share) { await navigator.share(data); return; }
+        await navigator.clipboard.writeText(url);
+        window.showToast('Ссылка скопирована — отправь друзьям');
+      } catch (e) {
+        if (e && e.name !== 'AbortError') window.showToast('Не получилось — скопируй ссылку из адресной строки');
+      }
     });
 
     root.querySelector('.video-play-button')?.addEventListener('click', () => {
