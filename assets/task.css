@@ -178,3 +178,5 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 
 .catalog-select{white-space:nowrap}
 @media(max-width:560px){.catalog-hero h1{font-size:23px}}
+.m-overline{border-top:1.5px solid currentColor;padding:0 1px}
+.select-pop-item.selected{background:var(--surface-2)}
