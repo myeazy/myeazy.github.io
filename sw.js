@@ -1,4 +1,4 @@
-const CACHE = 'eazy-v16';
+const CACHE = 'eazy-v17';
 const SHELL = [
   './',
   './index.html',
@@ -33,14 +33,14 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
+  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(
     fetch(e.request).then(resp => {
       if (resp && resp.status === 200) {
         const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
+        e.waitUntil(caches.open(CACHE).then(c => c.put(e.request, copy)));
       }
       return resp;
-    }).catch(() => caches.match(e.request, { ignoreSearch: true }))
+    }).catch(() => caches.match(e.request, { ignoreSearch: true }).then(m => m || (e.request.mode === 'navigate' ? caches.match('./404.html') : undefined)))
   );
 });
