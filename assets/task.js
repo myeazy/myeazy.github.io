@@ -7,12 +7,12 @@
   const firstActiveSubject = dataOk ? ((window.CATALOG.find(e => e.active) || window.CATALOG[0]).subjects.find(s => s.active) || {}).id : null;
   const subjectId = params.get('subject') || firstActiveSubject;
   const taskMeta = dataOk && subjectId ? window.getTask(id, subjectId) : null;
-  const subjectName = dataOk ? ((window.CATALOG.flatMap(e => e.subjects).find(s => s.id === subjectId) || {}).name || subjectId) : subjectId;
+  const subjectData = dataOk ? (window.CATALOG.flatMap(e => e.subjects).find(s => s.id === subjectId) || {}) : {};
+  const subjectName = subjectData.name || subjectId;
+  const subjectCase = subjectData.caseForm || String(subjectName).toLowerCase();
   const root = $('#lesson-content');
   let task = null;
 
-  // Системный лист «Поделиться»: только title + url — с полем text Chrome
-  // собирает текстовый интент и открывает свою шторку вместо системной.
   const shareLink = window.EAZY.shareLink;
 
   function normalize(value) {
@@ -194,7 +194,11 @@
     }));
 
     $('#lesson-share')?.addEventListener('click', () => {
-      const data = { title: `Задание ${task.id}: ${task.title} — EAZY`, url: location.href };
+      const data = {
+        title: `Задание ${task.id}: ${task.title} — EAZY`,
+        text: `Смотри, я нашёл разбор задания ${task.id} ЕГЭ по ${subjectCase} — EAZY`,
+        url: location.href
+      };
       if (shareLink) { shareLink(data); return; }
       if (navigator.share) { navigator.share(data).catch(() => {}); return; }
       window.showToast('Не получилось поделиться — скопируй ссылку из адресной строки');
