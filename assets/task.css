@@ -179,13 +179,3 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 #mode-cheat .lesson-section{margin-bottom:24px}
 
 @media(max-width:560px){.catalog-hero h1{font-size:23px}}
-
-/* Карточка задания: обёртка + кнопка «Поделиться» */
-.task-card-wrap{position:relative;display:flex;min-width:0}
-.task-card-wrap>.task-card{flex:1;min-width:0}
-.task-card-top{padding-right:34px}
-.card-share{position:absolute;top:10px;right:10px;z-index:1;width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s,border-color .15s,color .15s}
-.task-card-wrap:hover .card-share,.card-share:focus-visible{opacity:1}
-@media(hover:none){.card-share{opacity:1}}
-.card-share:hover{border-color:var(--accent);color:var(--accent)}
-.card-share svg{width:15px;height:15px;stroke-width:1.8}
