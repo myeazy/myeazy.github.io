@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* Manrope и IBM Plex Mono подключены в <head> через Google Fonts (preconnect + stylesheet).
+   Здесь — только токены, база и компоненты. */
 
 :root{
-  --bg:#f4f2ec;--surface:#fbfaf7;--surface-2:#eceae3;--ink:#17191c;--muted:#6f7370;--line:#dedbd2;
+  --bg:#f4f2ec;--surface:#fbfaf7;--surface-2:#eceae3;--ink:#17191c;--muted:#666a62;--line:#dedbd2;
   --accent:#e4501e;--accent-dark:#c44113;--accent-soft:#fbe3d8;
   --teal:#16685f;--teal-soft:#dcebe5;--green:#2a7d5f;--green-soft:#e0f0e8;--red:#c04f3e;
   --dark:#17191c;--dark-2:#22252a;--dark-line:#35393f;--dark-muted:#9aa0a3;
@@ -108,11 +109,12 @@ p{color:var(--muted)}
 .task-level{font-size:11px;color:var(--muted)}
 .task-card h3{font-size:15.5px;line-height:1.4;margin:0 0 5px}
 .task-card p{font-size:12.5px;margin:0 0 14px;line-height:1.55}
-.task-card-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px;margin-top:auto;font-size:11.5px;color:var(--muted)}
+.task-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:12px;margin-top:auto;font-size:11.5px;color:var(--muted)}
 .task-card-bottom span{display:flex;align-items:center;gap:5px}
 .task-card-bottom svg{width:13px;height:13px}
-.task-card-bottom .card-arrow{font-size:16px;color:var(--ink);transition:transform .15s}
+.task-card-bottom .card-arrow{font-size:16px;color:var(--ink);transition:transform .15s;margin-left:auto}
 .task-card:not(.placeholder):hover .card-arrow{transform:translate(2px,-2px)}
+.card-done{font:600 10px var(--mono);color:var(--green);background:var(--green-soft);padding:3px 8px;border-radius:99px}
 .card-tags{display:inline-flex;gap:5px}
 .card-tag{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px}
 .task-card.placeholder{background:transparent;border-style:dashed;box-shadow:none}
