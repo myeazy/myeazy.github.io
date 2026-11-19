@@ -3,8 +3,8 @@ window.EAZY_CONTENT[1] = {
   "intro": "Планиметрия — всё про фигуры на плоскости: треугольники, четырёхугольники и окружности. Собрал все формулы задания 1 в одну шпаргалку.",
   "theory": "Задание 1 — планиметрия: прямоугольные и равнобедренные треугольники, параллелограммы, трапеции, окружности и многоугольники. Смотри, какая фигура в условии, — и доставай её блок формул ниже. Большинство задач решаются одной формулой из карточек.",
   "figure": {
-    "caption": "Высота h к гипотенузе: из подобия треугольников h = AC · BC / AB",
-    "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Прямоугольный треугольник с высотой к гипотенузе"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M45 175 L320 175 L45 40 Z"/><path d="M45 175 L98 66" stroke-dasharray="6 5"/><path d="M45 159 L61 159 L61 175" stroke-width="1.4"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="26" y="196">A</text><text x="326" y="196">B</text><text x="26" y="32">C</text><text x="103" y="60">H</text><text x="64" y="124">h</text></g></svg>`
+    "caption": "Треугольник ABC: CH — высота к гипотенузе AB",
+    "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Прямоугольный треугольник ABC, CH — высота к гипотенузе AB"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M45 175 L320 175 L45 40 Z"/><path d="M45 175 L98 66" stroke-dasharray="6 5"/><path d="M45 159 L61 159 L61 175" stroke-width="1.4"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="26" y="196">A</text><text x="326" y="196">B</text><text x="26" y="32">C</text><text x="103" y="60">H</text></g></svg>`
   },
   "formulas": [
     [
@@ -60,10 +60,14 @@ window.EAZY_CONTENT[1] = {
     {
       "title": "Почему площадь трапеции — средняя линия на высоту",
       "text": "Возьмём две одинаковые трапеции с основаниями $a$ и $b$ и приложим вторую перевёрнутой. Вместе они дают параллелограмм с основанием $a + b$ и прежней высотой $h$. Его площадь равна $(a + b)h$, а трапеция — ровно половина: $S = \\frac{a+b}{2} h$. Средняя линия $m = \\frac{a+b}{2}$, поэтому $S = m h$."
+    },
+    {
+      "title": "Почему в описанном четырёхугольнике суммы противоположных сторон равны",
+      "text": "Пусть окружность касается сторон четырёхугольника в точках на $AB$, $BC$, $CD$ и $AD$. Отрезки касательных из одной вершины равны: из $A$ — по $x$, из $B$ — по $y$, из $C$ — по $z$, из $D$ — по $t$. Тогда $AB = x + y$, $CD = z + t$, $BC = y + z$, $AD = x + t$. Видно, что $AB + CD = x + y + z + t = BC + AD$."
     }
   ],
   "steps": [
-    "Определи фигуру из условия: треугольник, параллелограмм, трапеция, окружность или многоугольник.",
+    "Определи фигуру из условия: треугольник, четырёхугольник, окружность или многоугольник.",
     "Открой её карточку выше и выпиши, что дано и что ищем.",
     "Есть прямой угол — Пифагор и тригонометрия. Есть окружность — смотри на углы и дуги.",
     "Подставь числа в формулу и посчитай по действиям, без спешки.",
@@ -82,48 +86,55 @@ window.EAZY_CONTENT[1] = {
   ],
   "practices": [
     {
-      "text": "В прямоугольном треугольнике катеты равны 6 и 8. Найдите высоту, проведённую к гипотенузе.",
-      "hint": "Сначала гипотенуза по Пифагору, потом $CH = \\frac{AC \\cdot BC}{AB}$.",
-      "answer": "4,8",
+      "text": "В четырёхугольник ABCD, периметр которого равен 22, вписана окружность, AB = 8. Найдите длину стороны CD.",
+      "hint": "В описанном четырёхугольнике суммы противоположных сторон равны.",
+      "answer": "3",
       "accepted": [
-        "4,8",
-        "4.8"
+        "3"
       ],
-      "explanation": "Гипотенуза: $\\sqrt{6^2 + 8^2} = 10$. Высота: $CH = \\frac{6 \\cdot 8}{10} = 4{,}8$."
+      "explanation": "Периметр равен $2(AB + CD)$, значит $AB + CD = 11$, откуда $CD = 11 - 8 = 3$.",
+      "figure": {
+        "caption": "Четырёхугольник ABCD, вписанная окружность",
+        "svg": `<svg viewBox="0 0 360 220" role="img" aria-label="Четырёхугольник ABCD с вписанной окружностью"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M70 50 L300 62 L284 182 L56 170 Z"/><circle cx="180" cy="116" r="52"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="58" y="42">A</text><text x="306" y="54">B</text><text x="292" y="198">C</text><text x="44" y="188">D</text></g></svg>`
+      }
     },
     {
-      "text": "Стороны параллелограмма равны 6 и 10, угол между ними $30°$. Найдите его площадь.",
-      "hint": "$S = a \\cdot b \\cdot \\sin \\alpha$, а $\\sin 30° = \\frac{1}{2}$.",
-      "answer": "30",
+      "text": "Площадь треугольника ABC равна 60, DE — средняя линия, параллельная стороне AB. Найдите площадь трапеции ABED.",
+      "hint": "Средняя линия отсекает треугольник, подобный исходному, с коэффициентом $\\frac{1}{2}$.",
+      "answer": "45",
       "accepted": [
-        "30"
+        "45"
       ],
-      "explanation": "$S = 6 \\cdot 10 \\cdot \\sin 30° = 60 \\cdot \\frac{1}{2} = 30$."
+      "explanation": "Площадь отсечённого треугольника $CDE$: $60 \\cdot \\left(\\frac{1}{2}\\right)^2 = 15$. Тогда площадь трапеции $60 - 15 = 45$.",
+      "figure": {
+        "caption": "Треугольник ABC и средняя линия DE",
+        "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Треугольник ABC со средней линией DE"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M50 175 L320 175 L175 45 Z"/><path d="M112.5 110 L247.5 110"/><path d="M50 175 L112.5 110 L247.5 110 L320 175 Z" fill="currentColor" fill-opacity="0.08" stroke="none"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="36" y="196">A</text><text x="326" y="196">B</text><text x="167" y="32">C</text><text x="94" y="106">D</text><text x="252" y="106">E</text></g></svg>`
+      }
+    },
+    {
+      "text": "В треугольнике ABC угол C равен $54°$, AD — биссектриса, угол BAD равен $23°$. Найдите величину угла ADB. Ответ дайте в градусах.",
+      "hint": "Биссектриса делит угол $A$ пополам, а угол $ADB$ — внешний для треугольника $ADC$.",
+      "answer": "77",
+      "accepted": [
+        "77"
+      ],
+      "explanation": "∠DAC = ∠BAD = 23°, ∠C = 54°. Внешний угол треугольника $ADC$ при вершине $D$ равен $23° + 54° = 77°$.",
+      "figure": {
+        "caption": "Треугольник ABC, AD — биссектриса угла A",
+        "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Треугольник ABC с биссектрисой AD"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M40 175 L320 175 L140 45 Z"/><path d="M40 175 L177 67" stroke-dasharray="6 5"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="26" y="196">A</text><text x="326" y="196">B</text><text x="132" y="32">C</text><text x="182" y="60">D</text></g></svg>`
+      }
     },
     {
       "text": "Вписанный угол окружности опирается на дугу в $80°$. Найдите этот угол.",
-      "hint": "Вписанный угол — половина дуги.",
+      "hint": "Сравни вписанный угол с дугой, на которую он опирается.",
       "answer": "40",
       "accepted": [
         "40"
       ],
       "explanation": "Вписанный угол равен половине дуги: $\\frac{80°}{2} = 40°$.",
       "figure": {
-        "caption": "Вписанный ∠BAC и центральный ∠BOC опираются на одну дугу BC: вписанный вдвое меньше",
-        "svg": `<svg viewBox="0 0 360 230" role="img" aria-label="Вписанный и центральный угол"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="180" cy="115" r="78"/><path d="M180 37 L112 154 M180 37 L248 154"/><path d="M180 115 L112 154 M180 115 L248 154" stroke-width="1.6" stroke-dasharray="6 5"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="173" y="27">A</text><text x="98" y="175">B</text><text x="254" y="175">C</text><text x="188" y="122">O</text></g></svg>`
-      }
-    },
-    {
-      "text": "Основания трапеции равны 6 и 10, высота равна 4. Найдите её площадь.",
-      "hint": "Площадь трапеции — средняя линия на высоту.",
-      "answer": "32",
-      "accepted": [
-        "32"
-      ],
-      "explanation": "$S = \\frac{6 + 10}{2} \\cdot 4 = 8 \\cdot 4 = 32$.",
-      "figure": {
-        "caption": "Две такие трапеции складываются в параллелограмм: S = (a + b)·h / 2",
-        "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Трапеция с высотой"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M40 175 L320 175 L264 70 L96 70 Z"/><path d="M96 70 L96 175" stroke-dasharray="6 5"/><path d="M96 159 L112 159 L112 175" stroke-width="1.4"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="150" y="200">a = 10</text><text x="154" y="60">b = 6</text><text x="70" y="128">h</text></g></svg>`
+        "caption": "Окружность с центром O; дуга BC равна 80°",
+        "svg": `<svg viewBox="0 0 360 240" role="img" aria-label="Окружность с центром O, точки A, B, C и дуга BC"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="180" cy="115" r="78"/><path d="M180 37 L112 154 M180 37 L248 154"/><path d="M180 115 L112 154 M180 115 L248 154" stroke-width="1.6" stroke-dasharray="6 5"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="173" y="27">A</text><text x="98" y="175">B</text><text x="254" y="175">C</text><text x="188" y="122">O</text></g><text x="170" y="222" fill="currentColor" font-size="13">80°</text></svg>`
       }
     }
   ]
