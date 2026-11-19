@@ -90,11 +90,12 @@
 
   function taskCard(task, sid) {
     const card = task.ready ? 'a' : 'article';
+    const done = task.ready && storage.get(`done-${sid}-${task.id}`, false);
     return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="${taskUrl(sid, task.id)}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
       <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
       <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
       <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
-      <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
+      <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span>${done ? '<span class="card-done">✓ пройдено</span>' : ''}<span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
     </${card}>`;
   }
 
@@ -151,7 +152,7 @@
     const q = query.trim().toLowerCase();
     return allSearchable().filter(t => [t.id, t.title, t.short, t._sname, ...(t.tags || [])].join(' ').toLowerCase().includes(q));
   };
-  const resultRow = task => `<a class="search-result" href="${taskUrl(task._sid, task.id)}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)} · ${escapeHtml(task._sname)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`;
+  const resultRow = (task, i, sel) => `<a class="search-result${sel ? ' selected' : ''}" role="option" id="sr-${i}" aria-selected="${sel}" href="${taskUrl(task._sid, task.id)}"><span class="task-number">№ ${task.id}</span><span class="search-result-title">${escapeHtml(task.title)}<small>${escapeHtml(task.short)} · ${escapeHtml(task._sname)}</small></span><span class="status-label">${task.ready ? 'Разбор →' : 'скоро'}</span></a>`;
 
   const menuBtn = $('.menu-btn');
   if (menuBtn) {
@@ -241,18 +242,21 @@
       const q = menuSearch.value.trim().toLowerCase();
       const rows = [];
       CATALOG.forEach(exam => {
-        if (exam.label.toLowerCase().includes(q)) rows.push({ title: exam.label, sub: exam.active ? 'Каталог заданий' : 'раздел скоро появится', href: exam.active ? '/app/' : null });
+        if (exam.label.toLowerCase().includes(q)) rows.push({ title: exam.label, sub: exam.active ? 'Каталог заданий' : 'раздел скоро появится', href: exam.active ? '/app/' : null, sid: null });
         exam.subjects.forEach(s => {
-          if (s.name.toLowerCase().includes(q) || s.caseForm.includes(q)) rows.push({ title: s.name, sub: exam.label + (s.active ? ' · каталог' : ' · скоро'), href: s.active ? '/app/' : null });
+          if (s.name.toLowerCase().includes(q) || s.caseForm.includes(q)) rows.push({ title: s.name, sub: exam.label + (s.active ? ' · каталог' : ' · скоро'), href: s.active ? '/app/' : null, sid: s.active ? s.id : null });
         });
       });
       menuResults.innerHTML = rows.length ? rows.map(r => r.href
-        ? `<a class="search-result" href="${r.href}"><span class="search-result-title">${r.title}<small>${r.sub}</small></span><span class="status-label">Открыть →</span></a>`
+        ? `<a class="search-result" href="${r.href}"${r.sid ? ` data-subject="${r.sid}"` : ''}><span class="search-result-title">${r.title}<small>${r.sub}</small></span><span class="status-label">Открыть →</span></a>`
         : `<div class="search-result"><span class="search-result-title">${r.title}<small>${r.sub}</small></span><span class="status-label">скоро</span></div>`).join('')
         : '<div class="search-placeholder">Ничего не найдено. Попробуй «информатика».</div>';
       menuResults.hidden = false;
       menuNav.hidden = true;
-      menuResults.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+      menuResults.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        if (a.dataset.subject) storage.set('subject', a.dataset.subject);
+        closeMenu();
+      }));
     });
 
     applyTheme(document.documentElement.dataset.theme === 'dark');
@@ -293,13 +297,19 @@
     const input = $('#global-search');
     const results = $('#search-results');
     let selected = 0, matches = [], previousFocus;
+    input?.setAttribute('role', 'combobox');
+    input?.setAttribute('aria-expanded', 'false');
+    input?.setAttribute('aria-controls', 'search-results');
+    results?.setAttribute('role', 'listbox');
     const renderSearch = () => {
       matches = taskMatches(input.value).slice(0, 8);
       selected = Math.min(selected, Math.max(0, matches.length - 1));
-      results.innerHTML = matches.length ? matches.map((task, i) => resultRow(task).replace('class="search-result"', `class="search-result ${i === selected ? 'selected' : ''}'`)).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+      results.innerHTML = matches.length ? matches.map((task, i) => resultRow(task, i, i === selected)).join('') : '<div class="search-placeholder">Ничего не найдено. Попробуй «маска» или «13».</div>';
+      if (matches.length) input.setAttribute('aria-activedescendant', `sr-${selected}`);
+      else input.removeAttribute('aria-activedescendant');
     };
-    const openSearch = () => { previousFocus = document.activeElement; overlay.hidden = false; document.body.style.overflow = 'hidden'; input.value = ''; selected = 0; renderSearch(); input.focus(); };
-    const closeSearch = () => { overlay.hidden = true; document.body.style.overflow = ''; previousFocus?.focus(); };
+    const openSearch = () => { previousFocus = document.activeElement; overlay.hidden = false; document.body.style.overflow = 'hidden'; input.value = ''; selected = 0; renderSearch(); input.setAttribute('aria-expanded', 'true'); input.focus(); };
+    const closeSearch = () => { overlay.hidden = true; document.body.style.overflow = ''; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); previousFocus?.focus(); };
     $('.modal-close')?.addEventListener('click', closeSearch);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
     input?.addEventListener('input', () => { selected = 0; renderSearch(); });
@@ -308,20 +318,21 @@
       if (overlay.hidden) return;
       if (e.key === 'Escape') closeSearch();
       if (e.key === 'Tab') trapTab(overlay, e);
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length; renderSearch(); }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        if (!matches.length) return;
+        e.preventDefault();
+        selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length;
+        renderSearch();
+      }
       if (e.key === 'Enter' && matches[selected]) window.location.href = taskUrl(matches[selected]._sid, matches[selected].id);
     });
   }
 
-  if (history.pushState && location.pathname !== '/' && location.pathname !== '/app/') {
-    history.pushState({ eazyGuard: true }, '', location.href);
-    window.addEventListener('popstate', () => { window.location.href = '/app/'; });
-  }
-
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     let reloaded = false;
+    const hadController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (reloaded) return;
+      if (reloaded || !hadController) return;
       reloaded = true;
       location.reload();
     });
