@@ -40,11 +40,14 @@
 .lesson-section p strong{color:var(--ink);font-weight:700}
 .lead{font-size:15.5px!important;color:var(--ink)!important;margin-bottom:16px}
 .theory-divider{border:0;border-top:1px solid var(--line);margin:26px 0}
-.formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;margin:16px 0}
-.formula-card{padding:15px 16px;border:1px solid var(--line);background:var(--surface);border-radius:10px}
+.formula-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:16px 0}
+.formula-card{padding:15px 16px;border:1px solid var(--line);background:var(--surface);border-radius:12px}
 .formula-card h4{font-size:14px;margin:0 0 8px;letter-spacing:-.01em;color:var(--ink)}
 .formula-card p{font-size:13.5px;margin:0;line-height:1.8}
 .formula-card code{font-size:13px;padding:2px 7px}
+.formula-card.with-figure .figure-card{margin:10px 0 12px;padding:8px;background:var(--bg)}
+.formula-card.with-figure .figure-card svg{max-width:210px}
+.formula-card.with-figure .figure-card figcaption{display:none}
 code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--teal-soft);border-radius:4px;padding:1px 5px}
 .sec-label{font:600 10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
 .worked-example{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0}
@@ -57,6 +60,23 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .algorithm-list{list-style:none;padding:0;margin:18px 0;counter-reset:algorithm}
 .algorithm-list li{counter-increment:algorithm;display:flex;gap:14px;margin:13px 0;font-size:13.5px;line-height:1.8;color:var(--muted)}
 .algorithm-list li:before{content:counter(algorithm);width:24px;height:24px;flex-shrink:0;background:var(--surface);border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono);color:var(--teal);margin-top:1px}
+
+/* Выпадающие примеры из КИМ */
+.example-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.example-item{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.example-item summary{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;font-weight:700;font-size:13.5px;color:var(--ink);list-style:none}
+.example-item summary::-webkit-details-marker{display:none}
+.example-item summary:hover{background:var(--surface-2)}
+.ex-title{flex:1;min-width:0}
+.ex-chev{width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;flex-shrink:0;margin-top:-3px}
+.example-item[open] .ex-chev{transform:rotate(-135deg);margin-top:3px}
+.ex-body{padding:0 16px 16px;border-top:1px solid var(--line)}
+.ex-task{font-size:13.5px;color:var(--ink);margin:14px 0 8px;line-height:1.8}
+.ex-body .figure-card{margin:10px 0;padding:10px;background:var(--bg)}
+.ex-body .figure-card svg{max-width:300px}
+.ex-solution p{font-size:13px;color:var(--muted);line-height:1.85;margin:0}
+.ex-answer{margin-top:8px;font-size:12.5px;color:var(--green)}
+.ex-answer strong{font:600 14px var(--mono)}
 
 /* Выводы формул и чертежи */
 .proof-list{display:flex;flex-direction:column;gap:12px}
@@ -185,8 +205,6 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .lesson-toggle{display:flex;gap:4px;border:1px solid var(--line);border-radius:99px;padding:4px;background:var(--surface);margin:16px 0 22px;width:100%}
 .lt-btn{flex:1;border:0;background:transparent;padding:10px 12px;border-radius:99px;font-size:13.5px;font-weight:700;color:var(--muted);font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
 .lt-btn.active{background:var(--accent);color:#fff}
-.lesson-layout[data-mode="cheat"] #mode-full{display:none}
-.lesson-layout[data-mode="full"] #mode-cheat{display:none}
 .lesson-layout[data-mode="cheat"] .lesson-aside{display:none}
 #mode-cheat .lesson-section{margin-bottom:24px}
 
