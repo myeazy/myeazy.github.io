@@ -125,6 +125,7 @@
     const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${mathInline(escapeHtml(e))}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
     const codePanel = `<div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" data-copy>${icon('copy')} Копировать</button></div><pre><code>${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div>`;
 
+    // Шпаргалка — короткая выжимка без теории и без повторов.
     const cheatView = `
       <section class="lesson-section"><p class="sec-label">Формулы</p>${formulasBlock}</section>
       <section class="lesson-section">${stepsBlock}</section>
@@ -132,22 +133,20 @@
       ${errors.length ? `<section class="lesson-section"><p class="sec-label">Типичные ошибки</p>${errorsBox}</section>` : ''}
       ${hasCode ? `<section class="lesson-section"><p class="sec-label">Проверка кодом</p>${codePanel}</section>` : ''}`;
 
+    // Полный разбор — всё остальное: теория, чертежи, выводы, тренировка.
     let fullNo = 0;
     const fnum = () => String(++fullNo).padStart(2, '0');
     const fullView = `
       <section class="lesson-section" id="theory"><h2><span class="section-index">${fnum()}</span>Теория без воды</h2>
         <p class="lead">${mathInline(task.theory)}</p>
         ${figBlock(task.figure)}
-        ${formulasBlock}
-        <hr class="theory-divider">
-        ${stepsBlock}
-      </section>
-      <section class="lesson-section" id="example"><h2><span class="section-index">${fnum()}</span>Разбираем на примере</h2>
-        ${exampleBlock}
       </section>
       ${hasDerivation ? `<section class="lesson-section" id="derivation"><h2><span class="section-index">${fnum()}</span>Почему формулы работают</h2>
         <div class="proof-list">${task.derivation.map(d => `<div class="proof-card"><h3>${escapeHtml(d.title)}</h3><div class="proof-text">${mathInline(d.text)}</div></div>`).join('')}</div>
       </section>` : ''}
+      <section class="lesson-section" id="example"><h2><span class="section-index">${fnum()}</span>Разбираем на примере</h2>
+        ${exampleBlock}
+      </section>
       ${hasVideo ? `<section class="lesson-section" id="video"><h2><span class="section-index">${fnum()}</span>Видеоразбор</h2>
         <div class="video-card"><div class="video-placeholder"><button class="video-play-button" aria-label="Загрузить видео">${icon('play')}</button><div class="video-info"><h3>${escapeHtml(task.videoTitle)}</h3><p>${escapeHtml(task.videoAuthor)} · загрузится после нажатия</p><a class="text-link" href="${task.video}" target="_blank" rel="noopener noreferrer">Открыть на сайте источника ↗</a></div></div></div>
       </section>` : ''}
@@ -170,8 +169,10 @@
         }).join('')}</div>
       </section>` : ''}`;
 
+    const views = { cheat: cheatView, full: fullView };
     const mode = storage.get('view-mode', 'cheat') === 'full' ? 'full' : 'cheat';
-    root.innerHTML = `
+
+    const shellHtml = m => `
       <div class="lesson-header">
         <div class="lesson-head-main">
           <h1>${escapeHtml(task.title)}</h1>
@@ -182,26 +183,106 @@
         </button>
       </div>
       <div class="lesson-toggle" role="tablist" aria-label="Режим страницы">
-        <button class="lt-btn${mode === 'cheat' ? ' active' : ''}" data-mode="cheat" role="tab" aria-selected="${mode === 'cheat'}">⚡ Шпаргалка</button>
-        <button class="lt-btn${mode === 'full' ? ' active' : ''}" data-mode="full" role="tab" aria-selected="${mode === 'full'}">Полный разбор</button>
+        <button class="lt-btn${m === 'cheat' ? ' active' : ''}" data-mode="cheat" role="tab" aria-selected="${m === 'cheat'}">⚡ Шпаргалка</button>
+        <button class="lt-btn${m === 'full' ? ' active' : ''}" data-mode="full" role="tab" aria-selected="${m === 'full'}">Полный разбор</button>
       </div>
-      <div class="lesson-layout" data-mode="${mode}">
+      <div class="lesson-layout" data-mode="${m}">
         <div class="lesson-content">
-          <div id="mode-cheat">${cheatView}</div>
-          <div id="mode-full">${fullView}</div>
+          <div id="lesson-view">${views[m]}</div>
           <nav class="lesson-nav">${prev ? `<a href="/task/?subject=${subjectId}&id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next ? `<a class="next" href="/task/?subject=${subjectId}&id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
-          <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${hasDerivation ? '<a href="#derivation">Почему формулы</a>' : ''}${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
+          <a href="#theory" class="active">Теория</a>${hasDerivation ? '<a href="#derivation">Почему формулы</a>' : ''}<a href="#example">Пример</a>${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
         </nav></div></aside>
       </div>`;
 
-    root.querySelectorAll('.lt-btn').forEach(b => b.addEventListener('click', () => {
-      root.querySelectorAll('.lt-btn').forEach(x => { x.classList.toggle('active', x === b); x.setAttribute('aria-selected', String(x === b)); });
-      root.querySelector('.lesson-layout').dataset.mode = b.dataset.mode;
-      storage.set('view-mode', b.dataset.mode);
-      window.scrollTo(0, 0);
-    }));
+    root.innerHTML = shellHtml(mode);
+
+    const bindView = () => {
+      const view = root.querySelector('#lesson-view');
+      if (!view) return;
+
+      view.querySelector('.video-play-button')?.addEventListener('click', () => {
+        if (!embed) {
+          window.showToast('Видео откроется на сайте источника');
+          window.open(task.video, '_blank', 'noopener');
+          return;
+        }
+        const card = view.querySelector('.video-card');
+        card.innerHTML = `<div class="video-embed"><iframe src="${embed}" title="${escapeHtml(task.videoTitle)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+      });
+
+      view.querySelectorAll('.material-tab').forEach(tab => tab.addEventListener('click', () => {
+        view.querySelectorAll('.material-tab').forEach(t => t.classList.toggle('active', t === tab));
+        const pc = view.querySelector('#panel-code');
+        const pm = view.querySelector('#panel-mistakes');
+        if (pc) pc.hidden = tab.dataset.tab !== 'code';
+        if (pm) pm.hidden = tab.dataset.tab !== 'mistakes';
+      }));
+
+      view.querySelectorAll('.error-item button').forEach(btn => btn.addEventListener('click', () => {
+        const item = btn.closest('.error-item'); const open = item.classList.toggle('expanded');
+        btn.setAttribute('aria-expanded', open); item.querySelector('.error-detail').hidden = !open;
+      }));
+
+      view.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(task.code); window.showToast('Код скопирован в буфер обмена'); }
+        catch { window.showToast('Не получилось скопировать — выдели код вручную'); }
+      }));
+
+      const check = (card, index) => {
+        const p = practices[index];
+        const inputEl = card.querySelector('.answer-input');
+        const feedback = card.querySelector('.practice-feedback');
+        const value = inputEl.value;
+        if (!value.trim()) { window.showToast('Сначала введи ответ'); inputEl.focus(); return; }
+        const correct = p.accepted.some(a => normalize(a) === normalize(value));
+        card.classList.remove('correct', 'incorrect'); card.classList.add(correct ? 'correct' : 'incorrect');
+        inputEl.setAttribute('aria-invalid', String(!correct));
+        feedback.innerHTML = correct ? `<strong>Верно.</strong><div class="answer-explanation">${mathInline(p.explanation)}</div>` : `<strong>Не сходится.</strong> Правильный ответ: <strong>${mathInline(escapeHtml(p.answer))}</strong>.<div class="answer-explanation">${mathInline(p.explanation)}</div>`;
+        const cur = storage.get(`answers-${subjectId}-${task.id}`, {});
+        cur[index] = { value, correct }; storage.set(`answers-${subjectId}-${task.id}`, cur);
+        if (correct) window.showToast('Верно! Так держать');
+      };
+      view.querySelectorAll('[data-check]').forEach(btn => btn.addEventListener('click', () => check(btn.closest('.practice-card'), Number(btn.dataset.check))));
+      view.querySelectorAll('.answer-input').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(inp.closest('.practice-card'), Number(inp.closest('.practice-card').dataset.index)); }));
+      view.querySelectorAll('[data-hint]').forEach(btn => btn.addEventListener('click', () => {
+        const card = btn.closest('.practice-card');
+        if (card.querySelector('.practice-hint')) { card.querySelector('.practice-hint').remove(); return; }
+        card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${mathInline(practices[Number(btn.dataset.hint)].hint)}</div>`);
+      }));
+
+      const links = [...root.querySelectorAll('.toc a')];
+      const sections = links.map(a => root.querySelector(a.getAttribute('href'))).filter(Boolean);
+      if (sections.length) {
+        const spy = new IntersectionObserver(entries => {
+          entries.forEach(en => { if (en.isIntersecting) links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${en.target.id}`)); });
+        }, { rootMargin: '-20% 0px -60% 0px' });
+        sections.forEach(s => spy.observe(s));
+      }
+    };
+
+    const bindToggle = () => {
+      root.querySelectorAll('.lt-btn').forEach(btn => btn.addEventListener('click', () => {
+        const m = btn.dataset.mode;
+        const layout = root.querySelector('.lesson-layout');
+        if (!layout || layout.dataset.mode === m) return;
+        const values = [...root.querySelectorAll('.answer-input')].map(i => i.value);
+        root.querySelectorAll('.lt-btn').forEach(x => { x.classList.toggle('active', x === btn); x.setAttribute('aria-selected', String(x === btn)); });
+        layout.dataset.mode = m;
+        storage.set('view-mode', m);
+        const host = root.querySelector('#lesson-view');
+        if (host) {
+          host.innerHTML = views[m];
+          host.querySelectorAll('.answer-input').forEach((el, i) => { if (values[i]) el.value = values[i]; });
+        }
+        bindView();
+        window.scrollTo(0, 0);
+      }));
+    };
+
+    bindToggle();
+    bindView();
 
     $('#lesson-share')?.addEventListener('click', () => {
       const data = {
@@ -213,66 +294,15 @@
       if (navigator.share) { navigator.share(data).catch(() => {}); return; }
       window.showToast('Не получилось поделиться — скопируй ссылку из адресной строки');
     });
-
-    root.querySelector('.video-play-button')?.addEventListener('click', () => {
-      if (!embed) {
-        window.showToast('Видео откроется на сайте источника');
-        window.open(task.video, '_blank', 'noopener');
-        return;
-      }
-      const card = root.querySelector('.video-card');
-      card.innerHTML = `<div class="video-embed"><iframe src="${embed}" title="${escapeHtml(task.videoTitle)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
-    });
-
-    root.querySelectorAll('.material-tab').forEach(tab => tab.addEventListener('click', () => {
-      root.querySelectorAll('.material-tab').forEach(t => t.classList.toggle('active', t === tab));
-      $('#panel-code').hidden = tab.dataset.tab !== 'code';
-      $('#panel-mistakes').hidden = tab.dataset.tab !== 'mistakes';
-    }));
-    root.querySelectorAll('.error-item button').forEach(btn => btn.addEventListener('click', () => {
-      const item = btn.closest('.error-item'); const open = item.classList.toggle('expanded');
-      btn.setAttribute('aria-expanded', open); item.querySelector('.error-detail').hidden = !open;
-    }));
-    root.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(task.code); window.showToast('Код скопирован в буфер обмена'); }
-      catch { window.showToast('Не получилось скопировать — выдели код вручную'); }
-    }));
-
-    const check = (card, index) => {
-      const p = practices[index];
-      const inputEl = card.querySelector('.answer-input');
-      const feedback = card.querySelector('.practice-feedback');
-      const value = inputEl.value;
-      if (!value.trim()) { window.showToast('Сначала введи ответ'); inputEl.focus(); return; }
-      const correct = p.accepted.some(a => normalize(a) === normalize(value));
-      card.classList.remove('correct', 'incorrect'); card.classList.add(correct ? 'correct' : 'incorrect');
-      inputEl.setAttribute('aria-invalid', String(!correct));
-      feedback.innerHTML = correct ? `<strong>Верно.</strong><div class="answer-explanation">${mathInline(p.explanation)}</div>` : `<strong>Не сходится.</strong> Правильный ответ: <strong>${mathInline(escapeHtml(p.answer))}</strong>.<div class="answer-explanation">${mathInline(p.explanation)}</div>`;
-      const cur = storage.get(`answers-${subjectId}-${task.id}`, {});
-      cur[index] = { value, correct }; storage.set(`answers-${subjectId}-${task.id}`, cur);
-      if (correct) window.showToast('Верно! Так держать');
-    };
-    root.querySelectorAll('[data-check]').forEach(btn => btn.addEventListener('click', () => check(btn.closest('.practice-card'), Number(btn.dataset.check))));
-    root.querySelectorAll('.answer-input').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(inp.closest('.practice-card'), Number(inp.closest('.practice-card').dataset.index)); }));
-    root.querySelectorAll('[data-hint]').forEach(btn => btn.addEventListener('click', () => {
-      const card = btn.closest('.practice-card');
-      if (card.querySelector('.practice-hint')) { card.querySelector('.practice-hint').remove(); return; }
-      card.insertAdjacentHTML('beforeend', `<div class="practice-hint">${icon('info')} ${mathInline(practices[Number(btn.dataset.hint)].hint)}</div>`);
-    }));
-
-    const links = root.querySelectorAll('.toc a');
-    const sections = [...links].map(a => root.querySelector(a.getAttribute('href'))).filter(Boolean);
-    const spy = new IntersectionObserver(entries => {
-      entries.forEach(en => { if (en.isIntersecting) links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${en.target.id}`)); });
-    }, { rootMargin: '-20% 0px -60% 0px' });
-    sections.forEach(s => spy.observe(s));
   }
+
   window.addEventListener('scroll', () => {
     const bar = $('#reading-progress');
     if (!bar) return;
     const h = document.documentElement;
     bar.style.width = `${(h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100}%`;
   }, { passive: true });
+
   const loadContent = done => {
     if (!taskMeta || !taskMeta.ready) { done(); return; }
     const s = document.createElement('script');
