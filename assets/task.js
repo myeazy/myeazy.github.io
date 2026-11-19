@@ -102,8 +102,9 @@
     const subjectTasks = window.getTasks(subjectId);
     const ready = subjectTasks.filter(t => t.ready);
     const readyIdx = ready.findIndex(t => t.id === task.id);
-    const next = ready.length > 1 ? ready[(readyIdx + 1) % ready.length] : null;
-    const prev = ready.length > 1 ? ready[(readyIdx - 1 + ready.length) % ready.length] : null;
+    // Линейная навигация: без кольца, чтобы «предыдущий» и «следующий» не совпадали.
+    const prev = readyIdx > 0 ? ready[readyIdx - 1] : null;
+    const next = readyIdx >= 0 && readyIdx < ready.length - 1 ? ready[readyIdx + 1] : null;
     const embed = task.video ? videoEmbed(task.video) : null;
     const answers = storage.get(`answers-${subjectId}-${task.id}`, {});
 
