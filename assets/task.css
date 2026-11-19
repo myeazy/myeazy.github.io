@@ -58,6 +58,17 @@ code{font-family:var(--mono);font-size:.88em;color:var(--teal);background:var(--
 .algorithm-list li{counter-increment:algorithm;display:flex;gap:14px;margin:13px 0;font-size:13.5px;line-height:1.8;color:var(--muted)}
 .algorithm-list li:before{content:counter(algorithm);width:24px;height:24px;flex-shrink:0;background:var(--surface);border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono);color:var(--teal);margin-top:1px}
 
+/* Выводы формул и чертежи */
+.proof-list{display:flex;flex-direction:column;gap:12px}
+.proof-card{border:1px solid var(--line);border-left:3px solid var(--teal);background:var(--surface);border-radius:0 12px 12px 0;padding:16px 18px}
+.proof-card h3{font-size:15px;margin:0 0 8px;letter-spacing:-.01em}
+.proof-text{font-size:13.5px;line-height:1.85;color:var(--muted)}
+.proof-text strong{color:var(--ink);font-weight:700}
+.figure-card{margin:16px 0;padding:14px;border:1px solid var(--line);background:var(--surface);border-radius:12px}
+.figure-card svg{display:block;margin:0 auto;max-width:100%;height:auto;color:var(--ink)}
+.figure-card figcaption{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.6}
+.practice-card-header .figure-card{margin:10px 0 0;background:var(--bg)}
+
 .video-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
 .video-placeholder{padding:22px 20px;display:flex;align-items:center;gap:16px;background:var(--surface-2)}
 .video-play-button{width:46px;height:46px;flex-shrink:0;display:grid;place-items:center;background:var(--red);color:#fff;border:0;border-radius:50%}
