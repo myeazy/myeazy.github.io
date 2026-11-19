@@ -12,7 +12,7 @@
   let task = null;
 
   function normalize(value) {
-    return String(value).trim().toLowerCase().replace(/\s+/g, ' ').replace(/,(\d)/g, '.$1').replace(/[ё]/g, 'е');
+    return String(value).trim().toLowerCase().replace(/\s+/g, ' ').replace(/,\s*(?=\d)/g, '.').replace(/[ё]/g, 'е');
   }
   function highlightCode(source) {
     let s = escapeHtml(source);
@@ -54,14 +54,12 @@
     return String(html).replace(/\$([^$]+)\$/g, (m, tex) => mathTex(tex));
   }
   function videoEmbed(url) {
-    let embed = null;
-    const yt = value => (value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/) || [])[1];
-    const rt = value => (value.match(/rutube\.ru\/video\/([\da-f]+)/) || [])[1];
-    const ytId = yt(urlSafe(task.video)); const rtId = rt(urlSafe(task.video));
-    if (ytId) embed = `https://www.youtube-nocookie.com/embed/${ytId}`;
-    else if (rtId) embed = `https://rutube.ru/play/embed/${rtId}/`;
-    return embed;
-    function urlSafe(v) { return typeof v === 'string' ? v : ''; }
+    const u = typeof url === 'string' ? url : '';
+    const ytId = (u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/) || [])[1];
+    const rtId = (u.match(/rutube\.ru\/video\/([\da-f]+)/) || [])[1];
+    if (ytId) return `https://www.youtube-nocookie.com/embed/${ytId}`;
+    if (rtId) return `https://rutube.ru/play/embed/${rtId}/`;
+    return null;
   }
 
   function renderBroken() {
@@ -73,17 +71,24 @@
   function render() {
     const content = (window.EAZY_CONTENT || {})[id] || null;
     task = taskMeta ? { ...taskMeta, ...(content || {}) } : null;
-    if (task) task.ready = taskMeta.ready && !!content;
     $('#breadcrumb-task').textContent = task ? `${task.id}` : 'Не найдено';
     const bcSubject = $('#breadcrumb-subject');
-    if (bcSubject) bcSubject.textContent = subjectName;
+    if (bcSubject) {
+      bcSubject.textContent = subjectName;
+      bcSubject.addEventListener('click', () => storage.set('subject', subjectId));
+    }
     if (!task) {
       root.innerHTML = `<div class="empty-state"><h3>Такого задания нет</h3><p>Проверь ссылку или выбери номер из каталога.</p><a class="button button-primary" href="/app/">К каталогу</a></div>`;
       document.title = 'Задание не найдено — EAZY';
       return;
     }
     document.title = `Задание ${task.id}: ${task.title} — EAZY`;
-    if (!task.ready) {
+    if (taskMeta.ready && !content) {
+      root.innerHTML = `<div class="empty-state" style="margin-top:10px"><h2 style="font-size:22px">Разбор не загрузился</h2><p>Похоже, сбоит соединение или кеш браузера. Чаще всего помогает обычное обновление страницы.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="button button-primary" id="lesson-retry" type="button">Обновить страницу</button><a class="button button-secondary" href="/app/">В каталог</a></div></div>`;
+      $('#lesson-retry')?.addEventListener('click', () => location.reload());
+      return;
+    }
+    if (!taskMeta.ready) {
       const firstReady = window.getTasks(subjectId).find(x => x.ready);
       const altHref = firstReady ? `/task/?subject=${subjectId}&id=${firstReady.id}` : '/app/';
       const altLabel = firstReady ? `Открыть задание ${firstReady.id}` : 'В каталог';
@@ -97,6 +102,8 @@
     const prev = ready.length > 1 ? ready[(readyIdx - 1 + ready.length) % ready.length] : null;
     const embed = task.video ? videoEmbed(task.video) : null;
     const answers = storage.get(`answers-${subjectId}-${task.id}`, {});
+    const doneKey = `done-${subjectId}-${task.id}`;
+    const isDone = storage.get(doneKey, false);
 
     const hasVideo = !!task.video;
     const hasCode = !!task.code;
@@ -157,6 +164,7 @@
         <div>
         <h1>${escapeHtml(task.title)}</h1><p class="lesson-description">${mathInline(escapeHtml(task.intro))}</p>
         <div class="lesson-meta"><span>${icon('clock')} ${task.time} мин чтения</span><span>${icon('check')} Уровень: ${task.level}</span>${hasCode ? `<span>${icon('code')} Python</span>` : ''}</div></div>
+        <button class="lesson-done${isDone ? ' is-done' : ''}" id="lesson-done" type="button" aria-pressed="${isDone}">${isDone ? '✓ Пройдено' : 'Отметить пройденным'}</button>
       </div>
       <div class="lesson-toggle" role="tablist" aria-label="Режим страницы">
         <button class="lt-btn${mode === 'cheat' ? ' active' : ''}" data-mode="cheat" role="tab" aria-selected="${mode === 'cheat'}">⚡ Шпаргалка</button>
@@ -179,6 +187,16 @@
       storage.set('view-mode', b.dataset.mode);
       window.scrollTo(0, 0);
     }));
+
+    const doneBtn = $('#lesson-done');
+    doneBtn?.addEventListener('click', () => {
+      const now = !storage.get(doneKey, false);
+      storage.set(doneKey, now);
+      doneBtn.classList.toggle('is-done', now);
+      doneBtn.setAttribute('aria-pressed', String(now));
+      doneBtn.textContent = now ? '✓ Пройдено' : 'Отметить пройденным';
+      window.showToast(now ? 'Разбор отмечен пройденным' : 'Отметка о прохождении снята');
+    });
 
     root.querySelector('.video-play-button')?.addEventListener('click', () => {
       if (!embed) {
@@ -243,7 +261,8 @@
     if (!taskMeta || !taskMeta.ready) { done(); return; }
     const s = document.createElement('script');
     s.src = `/assets/tasks/${subjectId}/${String(id).padStart(2, '0')}.js`;
-    s.onload = s.onerror = () => done();
+    s.onload = () => done();
+    s.onerror = () => done();
     document.head.appendChild(s);
   };
   document.addEventListener('DOMContentLoaded', () => dataOk ? loadContent(render) : renderBroken());
