@@ -126,7 +126,7 @@
       return `<div class="formula-card${f.figure ? ' with-figure' : ''}"><h4>${escapeHtml(f.title)}</h4>${figBlock(f.figure)}<p>${mathInline(f.text)}</p></div>`;
     }).join('')}</div>`;
     const stepsBlock = `<p class="sec-label">Алгоритм решения</p><ol class="algorithm-list">${(task.steps || []).map(s => `<li>${mathInline(s)}</li>`).join('')}</ol>`;
-    const exampleBlock = `<div class="worked-example"><div class="example-problem"><p>${mathInline(task.example.text)}</p></div><div class="example-solution"><p>${mathInline(task.example.solution)}</p><div class="example-answer">${icon('check')} Ответ: <strong>${mathInline(escapeHtml(task.example.answer))}</strong></div></div></div>`;
+    const exampleBlock = task.example ? `<div class="worked-example"><div class="example-problem"><p>${mathInline(task.example.text)}</p></div><div class="example-solution"><p>${mathInline(task.example.solution)}</p><div class="example-answer">${icon('check')} Ответ: <strong>${mathInline(escapeHtml(task.example.answer))}</strong></div></div></div>` : '';
     const examplesBlock = examples.length ? `<div class="example-list">${examples.map(ex => `
       <details class="example-item">
         <summary><span class="ex-title">${escapeHtml(ex.title)}</span><span class="ex-chev" aria-hidden="true"></span></summary>
@@ -139,7 +139,6 @@
     const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${mathInline(escapeHtml(e))}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
     const codePanel = `<div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" data-copy>${icon('copy')} Копировать</button></div><pre><code>${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div>`;
 
-    // Шпаргалка — наглядно: формулы с чертежами + алгоритм.
     const cheatView = `
       <section class="lesson-section"><p class="sec-label">Формулы и чертежи</p>${formulasBlock}</section>
       <section class="lesson-section">${stepsBlock}</section>`;
@@ -158,9 +157,7 @@
         <div class="proof-list">${task.derivation.map(d => `<div class="proof-card"><h3>${escapeHtml(d.title)}</h3><div class="proof-text">${mathInline(d.text)}</div></div>`).join('')}</div>
       </section>` : ''}
       ${examples.length ? `<section class="lesson-section" id="examples"><h2><span class="section-index">${fnum()}</span>Примеры из КИМ по типам</h2>${examplesBlock}</section>` : ''}
-      <section class="lesson-section" id="example"><h2><span class="section-index">${fnum()}</span>Разбираем на примере</h2>
-        ${exampleBlock}
-      </section>
+      ${task.example ? `<section class="lesson-section" id="example"><h2><span class="section-index">${fnum()}</span>Разбираем на примере</h2>${exampleBlock}</section>` : ''}
       ${hasVideo ? `<section class="lesson-section" id="video"><h2><span class="section-index">${fnum()}</span>Видеоразбор</h2>
         <div class="video-card"><div class="video-placeholder"><button class="video-play-button" aria-label="Загрузить видео">${icon('play')}</button><div class="video-info"><h3>${escapeHtml(task.videoTitle)}</h3><p>${escapeHtml(task.videoAuthor)} · загрузится после нажатия</p><a class="text-link" href="${task.video}" target="_blank" rel="noopener noreferrer">Открыть на сайте источника ↗</a></div></div></div>
       </section>` : ''}
@@ -206,7 +203,7 @@
           <nav class="lesson-nav">${prev ? `<a href="/task/?subject=${subjectId}&id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next ? `<a class="next" href="/task/?subject=${subjectId}&id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
-          <a href="#theory" class="active">Теория</a><a href="#plan">План</a>${hasDerivation ? '<a href="#derivation">Почему формулы</a>' : ''}${examples.length ? '<a href="#examples">Примеры</a>' : ''}<a href="#example">Разбор</a>${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
+          <a href="#theory" class="active">Теория</a><a href="#plan">План</a>${hasDerivation ? '<a href="#derivation">Почему формулы</a>' : ''}${examples.length ? '<a href="#examples">Примеры</a>' : ''}${task.example ? '<a href="#example">Разбор</a>' : ''}${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
         </nav></div></aside>
       </div>`;
 
