@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const { $, icon, escapeHtml, storage } = window.Yasno;
+  const { $, icon, escapeHtml, storage } = window.EAZY;
   const params = new URLSearchParams(location.search);
   const id = Number(params.get('id'));
   const dataOk = typeof window.getTask === 'function' && typeof window.getTasks === 'function' && Array.isArray(window.CATALOG) && window.CATALOG.some(e => e.active && e.subjects.some(s => s.active));
@@ -32,6 +32,11 @@
     const OPS = { cdot:'·', times:'×', pm:'±', geq:'≥', leq:'≤', neq:'≠', to:'→', Rightarrow:'⇒', infty:'∞', deg:'°', approx:'≈', in:'∈' };
     const FN = ['log', 'ln', 'sin', 'cos', 'tg', 'ctg', 'lim', 'min', 'max'];
     let s = escapeHtml(src);
+    s = s.replace(/\\begin\{[a-zA-Z*]+\}/g, '').replace(/\\end\{[a-zA-Z*]+\}/g, '');
+    s = s.replace(/\\text\{([^{}]*)\}/g, '<span class="m-fn">$1</span>');
+    s = s.replace(/\\overline\{([^{}]*)\}/g, '<span class="m-overline">$1</span>');
+    s = s.replace(/\\left/g, '').replace(/\\right/g, '');
+    s = s.replace(/\\\\/g, '<br>');
     let prev;
     do {
       prev = s;
@@ -86,8 +91,10 @@
       return;
     }
     const subjectTasks = window.getTasks(subjectId);
-    const next = subjectTasks.find(t => t.ready && t.id > task.id) || subjectTasks.find(t => t.ready);
-    const prev = [...subjectTasks].reverse().find(t => t.ready && t.id < task.id);
+    const ready = subjectTasks.filter(t => t.ready);
+    const readyIdx = ready.findIndex(t => t.id === task.id);
+    const next = ready.length > 1 ? ready[(readyIdx + 1) % ready.length] : null;
+    const prev = ready.length > 1 ? ready[(readyIdx - 1 + ready.length) % ready.length] : null;
     const embed = task.video ? videoEmbed(task.video) : null;
     const answers = storage.get(`answers-${subjectId}-${task.id}`, {});
 
@@ -133,10 +140,13 @@
       ${practices.length ? `<section class="lesson-section" id="practice"><div class="practice-header"><h2><span class="section-index">${fnum()}</span>Тренировка</h2></div>
         <div class="practice-area">${practices.map((p, i) => {
           const saved = answers[i];
+          const savedFeedback = saved ? (saved.correct
+            ? `<strong>Верно.</strong><div class="answer-explanation">${mathInline(p.explanation)}</div>`
+            : `<strong>Не сходится.</strong> Правильный ответ: <strong>${mathInline(escapeHtml(p.answer))}</strong>.<div class="answer-explanation">${mathInline(p.explanation)}</div>`) : '';
           return `<article class="practice-card ${saved ? (saved.correct ? 'correct' : 'incorrect') : ''}" data-index="${i}">
             <div class="practice-card-header"><span class="practice-label">Задача ${i + 1}</span><h3>${mathInline(p.text)}</h3></div>
             <div class="practice-controls"><input class="answer-input" type="text" inputmode="text" placeholder="Твой ответ" value="${saved ? escapeHtml(saved.value) : ''}" autocomplete="off"><div class="practice-btns"><button class="hint-button" data-hint="${i}">Подсказка</button><button class="button button-primary" data-check="${i}">${icon('check')} Проверить</button></div></div>
-            <div class="practice-feedback"></div>
+            <div class="practice-feedback">${savedFeedback}</div>
           </article>`;
         }).join('')}</div>
       </section>` : ''}`;
@@ -156,7 +166,7 @@
         <div class="lesson-content">
           <div id="mode-cheat">${cheatView}</div>
           <div id="mode-full">${fullView}</div>
-          <nav class="lesson-nav">${prev ? `<a href="/task/?subject=${subjectId}&id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next && next.id !== task.id ? `<a class="next" href="/task/?subject=${subjectId}&id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
+          <nav class="lesson-nav">${prev ? `<a href="/task/?subject=${subjectId}&id=${prev.id}"><small>← Предыдущий разбор</small>Задание ${prev.id}: ${escapeHtml(prev.short)}</a>` : '<span></span>'}${next ? `<a class="next" href="/task/?subject=${subjectId}&id=${next.id}"><small>Следующий разбор →</small>Задание ${next.id}: ${escapeHtml(next.short)}</a>` : '<span></span>'}</nav>
         </div>
         <aside class="lesson-aside"><div class="toc"><p class="toc-title">Содержание</p><nav>
           <a href="#theory" class="active">Теория</a><a href="#example">Пример</a>${hasVideo ? '<a href="#video">Видеоразбор</a>' : ''}${hasCode ? '<a href="#code">Код и ошибки</a>' : (hasErrorsOnly ? '<a href="#errors">Типичные ошибки</a>' : '')}${practices.length ? '<a href="#practice">Тренировка</a>' : ''}
@@ -171,7 +181,11 @@
     }));
 
     root.querySelector('.video-play-button')?.addEventListener('click', () => {
-      if (!embed) return;
+      if (!embed) {
+        window.showToast('Видео откроется на сайте источника');
+        window.open(task.video, '_blank', 'noopener');
+        return;
+      }
       const card = root.querySelector('.video-card');
       card.innerHTML = `<div class="video-embed"><iframe src="${embed}" title="${escapeHtml(task.videoTitle)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
     });
@@ -198,10 +212,11 @@
       if (!value.trim()) { window.showToast('Сначала введи ответ'); inputEl.focus(); return; }
       const correct = p.accepted.some(a => normalize(a) === normalize(value));
       card.classList.remove('correct', 'incorrect'); card.classList.add(correct ? 'correct' : 'incorrect');
+      inputEl.setAttribute('aria-invalid', String(!correct));
       feedback.innerHTML = correct ? `<strong>Верно.</strong><div class="answer-explanation">${mathInline(p.explanation)}</div>` : `<strong>Не сходится.</strong> Правильный ответ: <strong>${mathInline(escapeHtml(p.answer))}</strong>.<div class="answer-explanation">${mathInline(p.explanation)}</div>`;
       const cur = storage.get(`answers-${subjectId}-${task.id}`, {});
       cur[index] = { value, correct }; storage.set(`answers-${subjectId}-${task.id}`, cur);
-      if (correct) { inputEl.setAttribute('aria-invalid', 'false'); window.showToast('Верно! Так держать'); }
+      if (correct) window.showToast('Верно! Так держать');
     };
     root.querySelectorAll('[data-check]').forEach(btn => btn.addEventListener('click', () => check(btn.closest('.practice-card'), Number(btn.dataset.check))));
     root.querySelectorAll('.answer-input').forEach(inp => inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(inp.closest('.practice-card'), Number(inp.closest('.practice-card').dataset.index)); }));
