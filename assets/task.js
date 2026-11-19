@@ -11,6 +11,10 @@
   const root = $('#lesson-content');
   let task = null;
 
+  // Системный лист «Поделиться»: только title + url — с полем text Chrome
+  // собирает текстовый интент и открывает свою шторку вместо системной.
+  const shareLink = window.EAZY.shareLink;
+
   function normalize(value) {
     return String(value).trim().toLowerCase().replace(/\s+/g, ' ').replace(/,\s*(?=\d)/g, '.').replace(/[ё]/g, 'е');
   }
@@ -189,16 +193,11 @@
       window.scrollTo(0, 0);
     }));
 
-    $('#lesson-share')?.addEventListener('click', async () => {
-      const url = location.href;
-      const data = { title: `Задание ${task.id}: ${task.title} — EAZY`, text: task.short || task.title, url };
-      try {
-        if (navigator.share) { await navigator.share(data); return; }
-        await navigator.clipboard.writeText(url);
-        window.showToast('Ссылка скопирована — отправь друзьям');
-      } catch (e) {
-        if (e && e.name !== 'AbortError') window.showToast('Не получилось — скопируй ссылку из адресной строки');
-      }
+    $('#lesson-share')?.addEventListener('click', () => {
+      const data = { title: `Задание ${task.id}: ${task.title} — EAZY`, url: location.href };
+      if (shareLink) { shareLink(data); return; }
+      if (navigator.share) { navigator.share(data).catch(() => {}); return; }
+      window.showToast('Не получилось поделиться — скопируй ссылку из адресной строки');
     });
 
     root.querySelector('.video-play-button')?.addEventListener('click', () => {
