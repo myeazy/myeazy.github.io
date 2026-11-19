@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const { storage } = window.Yasno;
+  const { storage } = window.EAZY;
   const exam = () => window.CATALOG.find(e => e.active) || window.CATALOG[0];
 
   const itemsFor = key => {
@@ -49,10 +49,23 @@
         if (!item || !item.enabled) { window.showToast?.('Этот раздел скоро появится'); return; }
         closePop();
         if (!item.current && key === 'subject') window.dispatchEvent(new CustomEvent('eazy:subject', { detail: item.id }));
+        if (!item.current && key === 'exam') window.dispatchEvent(new CustomEvent('eazy:exam', { detail: item.id }));
       }));
     };
+    let activeIdx = -1;
     render('');
-    input.addEventListener('input', () => render(input.value));
+    input.addEventListener('input', () => { activeIdx = -1; render(input.value); });
+    input.addEventListener('keydown', e => {
+      const opts = [...list.querySelectorAll('.select-pop-item')];
+      if (!opts.length) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = (activeIdx + (e.key === 'ArrowDown' ? 1 : -1) + opts.length) % opts.length;
+        opts.forEach((o, i) => o.classList.toggle('selected', i === activeIdx));
+        opts[activeIdx].scrollIntoView({ block: 'nearest' });
+      }
+      if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); opts[activeIdx].click(); }
+    });
     btn.setAttribute('aria-expanded', 'true');
     openPop = { pop, btn };
   }
@@ -68,4 +81,5 @@
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
   window.addEventListener('scroll', () => { if (openPop) closePop(); }, { passive: true });
+  window.addEventListener('resize', () => { if (openPop) closePop(); });
 })();

@@ -8,7 +8,7 @@
     get(key, fallback) { try { const value = localStorage.getItem(`yasno-${key}`); return value ? JSON.parse(value) : fallback; } catch (_) { return fallback; } },
     set(key, value) { try { localStorage.setItem(`yasno-${key}`, JSON.stringify(value)); } catch (_) {} }
   };
-  window.Yasno = { $, $$, icon, escapeHtml, storage };
+  window.EAZY = { $, $$, icon, escapeHtml, storage };
 
   const CATALOG = Array.isArray(window.CATALOG) ? window.CATALOG : [];
   const getTasks = typeof window.getTasks === 'function' ? window.getTasks : () => [];
@@ -56,6 +56,14 @@
   }
   window.toggleTheme = toggleTheme;
 
+  const trapTab = (container, e) => {
+    const focusables = [...container.querySelectorAll('a[href], button:not([disabled]), input')].filter(el => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+
   window.showToast = message => {
     let toast = $('.toast');
     if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; toast.setAttribute('role', 'status'); document.body.append(toast); }
@@ -65,7 +73,8 @@
     window.toastTimer = setTimeout(() => toast.classList.remove('visible'), 2800);
   };
 
-  const activeExam = () => CATALOG.find(e => e.active) || CATALOG[0];
+  let currentExamId = storage.get('exam', null);
+  const activeExam = () => CATALOG.find(e => e.id === currentExamId) || CATALOG.find(e => e.active) || CATALOG[0];
   const firstSubject = () => (activeExam()?.subjects || []).find(s => s.active)?.id || null;
   const subjectMeta = sid => activeExam().subjects.find(s => s.id === sid) || null;
   const taskUrl = (sid, id) => `/task/?subject=${sid}&id=${id}`;
@@ -114,6 +123,16 @@
       $$('[data-select="exam"] > span').forEach(el => el.textContent = activeExam().label);
     };
     syncSubjectLabel();
+    window.addEventListener('eazy:exam', e => {
+      const exam = CATALOG.find(x => x.id === e.detail);
+      if (!exam || !exam.active) return;
+      currentExamId = exam.id;
+      storage.set('exam', exam.id);
+      const first = (exam.subjects.find(s => s.active && getTasks(s.id).length) || {}).id;
+      if (first) { currentSubject = first; storage.set('subject', first); }
+      syncSubjectLabel();
+      renderCatalog();
+    });
     window.addEventListener('eazy:subject', e => {
       const sid = e.detail;
       if (!getTasks(sid).length) return;
@@ -179,12 +198,15 @@
       </div>`;
     document.body.appendChild(ov);
 
-    const openMenu = () => { ov.hidden = false; menuBtn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden'; requestAnimationFrame(() => ov.classList.add('open')); };
-    const closeMenu = () => { ov.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; setTimeout(() => { ov.hidden = true; }, 240); };
+    const openMenu = () => { ov.hidden = false; menuBtn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden'; requestAnimationFrame(() => ov.classList.add('open')); ov.querySelector('.menu-close').focus(); };
+    const closeMenu = () => { ov.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = ''; menuBtn.focus(); setTimeout(() => { if (!ov.classList.contains('open')) ov.hidden = true; }, 240); };
     menuBtn.addEventListener('click', () => ov.hidden ? openMenu() : closeMenu());
     ov.querySelector('.menu-close').addEventListener('click', closeMenu);
     ov.addEventListener('click', e => { if (e.target === ov) closeMenu(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) closeMenu(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !ov.hidden) closeMenu();
+      if (e.key === 'Tab' && !ov.hidden) trapTab(ov, e);
+    });
 
     ov.querySelectorAll('.acc-head:not(.disabled)').forEach(head => {
       head.addEventListener('click', () => {
@@ -285,6 +307,7 @@
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); overlay.hidden ? openSearch() : closeSearch(); }
       if (overlay.hidden) return;
       if (e.key === 'Escape') closeSearch();
+      if (e.key === 'Tab') trapTab(overlay, e);
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); selected = (selected + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length; renderSearch(); }
       if (e.key === 'Enter' && matches[selected]) window.location.href = taskUrl(matches[selected]._sid, matches[selected].id);
     });
