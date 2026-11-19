@@ -1,4 +1,4 @@
-const CACHE = 'eazy-v17';
+const CACHE = 'eazy-v18';
 const SHELL = [
   './',
   './index.html',
@@ -32,10 +32,11 @@ self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
+// Сетевой-first с ревалидацией: не отдаём закешированные 10 минут старые версии.
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(
-    fetch(e.request).then(resp => {
+    fetch(e.request, { cache: 'no-cache' }).then(resp => {
       if (resp && resp.status === 200) {
         const copy = resp.clone();
         e.waitUntil(caches.open(CACHE).then(c => c.put(e.request, copy)));
