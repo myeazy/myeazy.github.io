@@ -9,11 +9,11 @@
     set(key, value) { try { localStorage.setItem(`yasno-${key}`, JSON.stringify(value)); } catch (_) {} }
   };
 
-  // Системный лист «Поделиться». Передаём только title + url:
-  // с полем text Chrome собирает текстовый интент и открывает свою шторку вместо системной.
-  async function shareLink({ title, url }) {
+  // Системный лист «Поделиться»: title + осмысленный текст + ссылка.
+  async function shareLink({ title, text, url }) {
     const abs = /^https?:/i.test(url || '') ? url : location.origin + (url || '/');
     const payload = { title, url: abs };
+    if (text) payload.text = text;
     if (navigator.share && (!navigator.canShare || navigator.canShare(payload))) {
       try { await navigator.share(payload); return true; }
       catch (e) { if (e && e.name === 'AbortError') return false; }
@@ -110,15 +110,12 @@
 
   function taskCard(task, sid) {
     const card = task.ready ? 'a' : 'article';
-    return `<div class="task-card-wrap">
-      <${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="${taskUrl(sid, task.id)}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
-        <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
-        <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
-        <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
-        <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
-      </${card}>
-      ${task.ready ? `<button class="card-share" type="button" aria-label="Поделиться заданием ${task.id}" title="Поделиться" data-share data-share-title="Задание ${task.id}: ${escapeHtml(task.title)} — EAZY" data-share-url="${taskUrl(sid, task.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></button>` : ''}
-    </div>`;
+    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="${taskUrl(sid, task.id)}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
+      <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
+      <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
+      <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
+      <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
+    </${card}>`;
   }
 
   const catalogGrid = $('#catalog-grid');
@@ -140,13 +137,6 @@
     };
     $('#catalog-search').addEventListener('input', renderCatalog);
     $('#reset-catalog')?.addEventListener('click', () => { $('#catalog-search').value = ''; renderCatalog(); });
-    catalogGrid.addEventListener('click', e => {
-      const btn = e.target.closest('[data-share]');
-      if (!btn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      shareLink({ title: btn.dataset.shareTitle, url: btn.dataset.shareUrl });
-    });
     const syncSubjectLabel = () => {
       const meta = subjectMeta(currentSubject);
       if (meta) $$('[data-select="subject"] > span').forEach(el => el.textContent = meta.caseForm);
@@ -293,7 +283,11 @@
 
   const shareBtn = $('#share-btn');
   if (shareBtn) {
-    shareBtn.addEventListener('click', () => shareLink({ title: 'EAZY — разборы ЕГЭ', url: 'https://myeazy.github.io/' }));
+    shareBtn.addEventListener('click', () => shareLink({
+      title: 'EAZY — разборы ЕГЭ',
+      text: 'Смотри, я нашёл EAZY — понятные разборы заданий ЕГЭ: теория, примеры, код и тренировка',
+      url: 'https://myeazy.github.io/'
+    }));
   }
 
   const contribList = $('#contrib-list');
