@@ -4,7 +4,7 @@ window.EAZY_CONTENT[1] = {
   "theory": "Задание 1 — планиметрия: прямоугольные и равнобедренные треугольники, параллелограммы, трапеции, окружности и многоугольники. Смотри, какая фигура в условии, — и доставай её блок формул ниже. Большинство задач решаются одной формулой из карточек.",
   "figure": {
     "caption": "Высота h к гипотенузе: из подобия треугольников h = AC · BC / AB",
-    "svg": `<svg viewBox="0 0 340 190" role="img" aria-label="Прямоугольный треугольник с высотой к гипотенузе"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M40 155 L300 155 L40 35 Z"/><path d="M40 155 L86 56" stroke-dasharray="5 4"/><path d="M40 139 L56 139 L56 155" stroke-width="1.2"/></g><g fill="currentColor" font-size="12" font-style="italic"><text x="26" y="172">A</text><text x="304" y="172">B</text><text x="26" y="30">C</text><text x="91" y="52">H</text><text x="58" y="106">h</text></g></svg>`
+    "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Прямоугольный треугольник с высотой к гипотенузе"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M45 175 L320 175 L45 40 Z"/><path d="M45 175 L98 66" stroke-dasharray="6 5"/><path d="M45 159 L61 159 L61 175" stroke-width="1.4"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="26" y="196">A</text><text x="326" y="196">B</text><text x="26" y="32">C</text><text x="103" y="60">H</text><text x="64" y="124">h</text></g></svg>`
   },
   "formulas": [
     [
@@ -107,7 +107,11 @@ window.EAZY_CONTENT[1] = {
       "accepted": [
         "40"
       ],
-      "explanation": "Вписанный угол равен половине дуги: $\\frac{80°}{2} = 40°$."
+      "explanation": "Вписанный угол равен половине дуги: $\\frac{80°}{2} = 40°$.",
+      "figure": {
+        "caption": "Вписанный ∠BAC и центральный ∠BOC опираются на одну дугу BC: вписанный вдвое меньше",
+        "svg": `<svg viewBox="0 0 360 230" role="img" aria-label="Вписанный и центральный угол"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="180" cy="115" r="78"/><path d="M180 37 L112 154 M180 37 L248 154"/><path d="M180 115 L112 154 M180 115 L248 154" stroke-width="1.6" stroke-dasharray="6 5"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="173" y="27">A</text><text x="98" y="175">B</text><text x="254" y="175">C</text><text x="188" y="122">O</text></g></svg>`
+      }
     },
     {
       "text": "Основания трапеции равны 6 и 10, высота равна 4. Найдите её площадь.",
@@ -116,7 +120,11 @@ window.EAZY_CONTENT[1] = {
       "accepted": [
         "32"
       ],
-      "explanation": "$S = \\frac{6 + 10}{2} \\cdot 4 = 8 \\cdot 4 = 32$."
+      "explanation": "$S = \\frac{6 + 10}{2} \\cdot 4 = 8 \\cdot 4 = 32$.",
+      "figure": {
+        "caption": "Две такие трапеции складываются в параллелограмм: S = (a + b)·h / 2",
+        "svg": `<svg viewBox="0 0 360 210" role="img" aria-label="Трапеция с высотой"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M40 175 L320 175 L264 70 L96 70 Z"/><path d="M96 70 L96 175" stroke-dasharray="6 5"/><path d="M96 159 L112 159 L112 175" stroke-width="1.4"/></g><g fill="currentColor" font-size="15" font-style="italic"><text x="150" y="200">a = 10</text><text x="154" y="60">b = 6</text><text x="70" y="128">h</text></g></svg>`
+      }
     }
   ]
 };
