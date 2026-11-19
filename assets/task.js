@@ -125,15 +125,11 @@
     const errorsBox = `<div class="errors-box">${errors.map(e => `<div class="error-item"><button type="button" aria-expanded="false">${icon('plus')}<span>${mathInline(escapeHtml(e))}</span></button><p class="error-detail" hidden>Обрати на это внимание при проверке решения: именно здесь чаще всего теряют балл в этом номере.</p></div>`).join('')}</div>`;
     const codePanel = `<div class="code-panel"><div class="code-toolbar"><span class="file-tab">решение.py</span><span>python 3.12</span><button class="copy-code" data-copy>${icon('copy')} Копировать</button></div><pre><code>${highlightCode(task.code)}</code></pre><div class="code-note">${icon('info')} Код можно вставить в IDLE или редактор на экзамене — библиотеки из стандартной поставки разрешены.</div></div>`;
 
-    // Шпаргалка — короткая выжимка без теории и без повторов.
+    // Шпаргалка — только выжимка: формулы и алгоритм. Без повторов с полным разбором.
     const cheatView = `
       <section class="lesson-section"><p class="sec-label">Формулы</p>${formulasBlock}</section>
-      <section class="lesson-section">${stepsBlock}</section>
-      <section class="lesson-section"><p class="sec-label">Пример</p>${exampleBlock}</section>
-      ${errors.length ? `<section class="lesson-section"><p class="sec-label">Типичные ошибки</p>${errorsBox}</section>` : ''}
-      ${hasCode ? `<section class="lesson-section"><p class="sec-label">Проверка кодом</p>${codePanel}</section>` : ''}`;
+      <section class="lesson-section">${stepsBlock}</section>`;
 
-    // Полный разбор — всё остальное: теория, чертежи, выводы, тренировка.
     let fullNo = 0;
     const fnum = () => String(++fullNo).padStart(2, '0');
     const fullView = `
