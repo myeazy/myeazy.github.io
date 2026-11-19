@@ -8,7 +8,27 @@
     get(key, fallback) { try { const value = localStorage.getItem(`yasno-${key}`); return value ? JSON.parse(value) : fallback; } catch (_) { return fallback; } },
     set(key, value) { try { localStorage.setItem(`yasno-${key}`, JSON.stringify(value)); } catch (_) {} }
   };
-  window.EAZY = { $, $$, icon, escapeHtml, storage };
+
+  // Системный лист «Поделиться». Передаём только title + url:
+  // с полем text Chrome собирает текстовый интент и открывает свою шторку вместо системной.
+  async function shareLink({ title, url }) {
+    const abs = /^https?:/i.test(url || '') ? url : location.origin + (url || '/');
+    const payload = { title, url: abs };
+    if (navigator.share && (!navigator.canShare || navigator.canShare(payload))) {
+      try { await navigator.share(payload); return true; }
+      catch (e) { if (e && e.name === 'AbortError') return false; }
+    }
+    try {
+      await navigator.clipboard.writeText(abs);
+      window.showToast('Системный «Поделиться» недоступен — ссылка скопирована');
+      return true;
+    } catch (_) {
+      window.showToast('Не получилось — скопируй ссылку из адресной строки');
+      return false;
+    }
+  }
+
+  window.EAZY = { $, $$, icon, escapeHtml, storage, shareLink };
 
   const CATALOG = Array.isArray(window.CATALOG) ? window.CATALOG : [];
   const getTasks = typeof window.getTasks === 'function' ? window.getTasks : () => [];
@@ -90,12 +110,15 @@
 
   function taskCard(task, sid) {
     const card = task.ready ? 'a' : 'article';
-    return `<${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="${taskUrl(sid, task.id)}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
-      <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
-      <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
-      <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
-      <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
-    </${card}>`;
+    return `<div class="task-card-wrap">
+      <${card} class="task-card${task.ready ? '' : ' placeholder'}"${task.ready ? ` href="${taskUrl(sid, task.id)}" aria-label="Открыть разбор задания ${task.id}: ${escapeHtml(task.title)}"` : ''}>
+        <div class="task-card-top"><span class="task-number">Задание ${String(task.id).padStart(2, '0')}</span><span class="task-level">${task.level}</span></div>
+        <h3>${escapeHtml(task.title)}</h3><p>${escapeHtml(task.short)}</p>
+        <span class="card-ghost" aria-hidden="true">${String(task.id).padStart(2, '0')}</span>
+        <div class="task-card-bottom">${task.ready ? `<span>${icon('clock')} ${task.time} мин чтения</span><span class="card-arrow" aria-hidden="true">↗</span>` : `<span class="card-tags"><span class="card-tag">скоро</span><span class="card-tag">${task.category === 'code' ? 'Python' : 'теория'}</span></span><span class="task-level">В работе</span>`}</div>
+      </${card}>
+      ${task.ready ? `<button class="card-share" type="button" aria-label="Поделиться заданием ${task.id}" title="Поделиться" data-share data-share-title="Задание ${task.id}: ${escapeHtml(task.title)} — EAZY" data-share-url="${taskUrl(sid, task.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></button>` : ''}
+    </div>`;
   }
 
   const catalogGrid = $('#catalog-grid');
@@ -117,6 +140,13 @@
     };
     $('#catalog-search').addEventListener('input', renderCatalog);
     $('#reset-catalog')?.addEventListener('click', () => { $('#catalog-search').value = ''; renderCatalog(); });
+    catalogGrid.addEventListener('click', e => {
+      const btn = e.target.closest('[data-share]');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      shareLink({ title: btn.dataset.shareTitle, url: btn.dataset.shareUrl });
+    });
     const syncSubjectLabel = () => {
       const meta = subjectMeta(currentSubject);
       if (meta) $$('[data-select="subject"] > span').forEach(el => el.textContent = meta.caseForm);
@@ -263,14 +293,7 @@
 
   const shareBtn = $('#share-btn');
   if (shareBtn) {
-    shareBtn.addEventListener('click', async () => {
-      const data = { title: 'EAZY — разборы ЕГЭ', text: 'Понятные разборы заданий ЕГЭ: теория, примеры, код и тренировка с проверкой ответа.', url: 'https://myeazy.github.io/' };
-      try {
-        if (navigator.share) { await navigator.share(data); return; }
-        await navigator.clipboard.writeText(data.url);
-        window.showToast('Ссылка скопирована — отправь друзьям');
-      } catch (e) { if (e && e.name !== 'AbortError') window.showToast('Не получилось — скопируй ссылку из адресной строки'); }
-    });
+    shareBtn.addEventListener('click', () => shareLink({ title: 'EAZY — разборы ЕГЭ', url: 'https://myeazy.github.io/' }));
   }
 
   const contribList = $('#contrib-list');
